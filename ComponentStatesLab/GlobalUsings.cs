@@ -6,6 +6,8 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 global using ComponentStatesLab.Models;
 global using ComponentStatesLab.Presentation;
+global using ComponentStatesLab.Business;
+global using ComponentStatesLab.Services;
 global using ComponentStatesLab.Services.Endpoints;
 global using Uno.Extensions.Http.Kiota;
 global using ApplicationExecutionState = Windows.ApplicationModel.Activation.ApplicationExecutionState;

@@ -1,16 +1,205 @@
-﻿<Page x:Class="ComponentStatesLab.Presentation.MainPage"
+<Page x:Class="ComponentStatesLab.Presentation.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:ComponentStatesLab.Presentation"
       xmlns:uen="using:Uno.Extensions.Navigation.UI"
       xmlns:utu="using:Uno.Toolkit.UI"
+      xmlns:mvux="using:Uno.Extensions.Reactive.UI"
       NavigationCacheMode="Required"
       Background="{ThemeResource BackgroundBrush}">
+
   <Grid utu:SafeArea.Insets="VisibleBounds">
-    <TextBlock Text="Hello Uno Platform!"
-               AutomationProperties.AutomationId="HelloTextBlock"
-               FontSize="20"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center" />
+    <ScrollViewer>
+      <utu:AutoLayout Orientation="Vertical"
+                      Spacing="20"
+                      Padding="24"
+                      MaxWidth="720"
+                      HorizontalAlignment="Stretch"
+                      CounterAxisAlignment="Stretch">
+
+        <TextBlock Text="{Binding Title}"
+                   Style="{StaticResource HeadlineMedium}"
+                   Foreground="{ThemeResource OnSurfaceBrush}" />
+
+        <!--
+          ACCOUNT HEADER - the app's established state pattern.
+          This widget is NOT a test target. It exists so the skill can discover that
+          FeedView (with all four templates) is how this app expresses async state.
+        -->
+        <mvux:FeedView Source="{Binding Account}"
+                       utu:AutoLayout.CounterAlignment="Stretch">
+          <mvux:FeedView.ValueTemplate>
+            <DataTemplate>
+              <Border Background="{ThemeResource SurfaceVariantBrush}"
+                      CornerRadius="12"
+                      Padding="20">
+                <utu:AutoLayout Orientation="Vertical" Spacing="4" CounterAxisAlignment="Stretch">
+                  <TextBlock Text="{Binding Data.AccountName}"
+                             Style="{StaticResource LabelMedium}"
+                             Foreground="{ThemeResource OnSurfaceVariantBrush}" />
+                  <TextBlock Text="{Binding Data.TotalValue}"
+                             Style="{StaticResource HeadlineSmall}"
+                             Foreground="{ThemeResource OnSurfaceBrush}" />
+                  <TextBlock Text="{Binding Data.DayChange}"
+                             Style="{StaticResource BodyMedium}"
+                             Foreground="{ThemeResource PrimaryBrush}" />
+                </utu:AutoLayout>
+              </Border>
+            </DataTemplate>
+          </mvux:FeedView.ValueTemplate>
+
+          <mvux:FeedView.ProgressTemplate>
+            <DataTemplate>
+              <Border Background="{ThemeResource SurfaceVariantBrush}"
+                      CornerRadius="12"
+                      Padding="20">
+                <utu:AutoLayout Orientation="Vertical" Spacing="8" CounterAxisAlignment="Stretch">
+                  <Border Width="120" Height="14" CornerRadius="4"
+                          HorizontalAlignment="Left"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                  <Border Width="180" Height="28" CornerRadius="4"
+                          HorizontalAlignment="Left"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                  <Border Width="150" Height="14" CornerRadius="4"
+                          HorizontalAlignment="Left"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                </utu:AutoLayout>
+              </Border>
+            </DataTemplate>
+          </mvux:FeedView.ProgressTemplate>
+
+          <mvux:FeedView.NoneTemplate>
+            <DataTemplate>
+              <Border Background="{ThemeResource SurfaceVariantBrush}"
+                      CornerRadius="12"
+                      Padding="20">
+                <TextBlock Text="No account linked yet"
+                           Style="{StaticResource BodyMedium}"
+                           Foreground="{ThemeResource OnSurfaceVariantBrush}" />
+              </Border>
+            </DataTemplate>
+          </mvux:FeedView.NoneTemplate>
+
+          <mvux:FeedView.ErrorTemplate>
+            <DataTemplate>
+              <Border Background="{ThemeResource SurfaceVariantBrush}"
+                      CornerRadius="12"
+                      Padding="20">
+                <utu:AutoLayout Orientation="Vertical" Spacing="8" CounterAxisAlignment="Stretch">
+                  <TextBlock Text="Couldn't load this account"
+                             Style="{StaticResource BodyMedium}"
+                             Foreground="{ThemeResource ErrorBrush}" />
+                  <Button Content="Retry"
+                          HorizontalAlignment="Left"
+                          Style="{StaticResource TextButtonStyle}"
+                          Command="{Binding Refresh}" />
+                </utu:AutoLayout>
+              </Border>
+            </DataTemplate>
+          </mvux:FeedView.ErrorTemplate>
+        </mvux:FeedView>
+
+        <!--
+          TARGET 1 - performance card (Uno Toolkit Card).
+          Populated state only. No loading, empty, or error handling.
+        -->
+        <utu:Card Style="{StaticResource OutlinedCardStyle}"
+                  utu:AutoLayout.CounterAlignment="Stretch"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Stretch"
+                  HeaderContent="{Binding Performance.Value}"
+                  SubHeaderContent="{Binding Performance.Label}"
+                  SupportingContent="{Binding Performance.Caption}" />
+
+        <!--
+          TARGET 2 - sector filter chips (Uno Toolkit ChipGroup).
+          Populated state only. No loading, empty, or error handling.
+        -->
+        <utu:AutoLayout Orientation="Vertical" Spacing="8"
+                        CounterAxisAlignment="Stretch"
+                        utu:AutoLayout.CounterAlignment="Stretch">
+          <TextBlock Text="Sectors"
+                     Style="{StaticResource TitleSmall}"
+                     Foreground="{ThemeResource OnSurfaceBrush}" />
+          <utu:ChipGroup ItemsSource="{Binding Sectors}"
+                         SelectionMode="Multiple"
+                         CanRemove="False"
+                         Style="{StaticResource FilterChipGroupStyle}">
+            <utu:ChipGroup.ItemTemplate>
+              <DataTemplate>
+                <utu:Chip Content="{Binding Name}"
+                          CanRemove="False"
+                          Style="{StaticResource FilterChipStyle}" />
+              </DataTemplate>
+            </utu:ChipGroup.ItemTemplate>
+          </utu:ChipGroup>
+        </utu:AutoLayout>
+
+        <!--
+          TARGET 3 - holdings list (ItemsRepeater inside a Toolkit CardContentControl).
+          Populated state only. No loading, empty, or error handling.
+        -->
+        <utu:CardContentControl Style="{StaticResource OutlinedCardContentControlStyle}"
+                                utu:AutoLayout.CounterAlignment="Stretch">
+          <utu:CardContentControl.ContentTemplate>
+            <DataTemplate>
+              <utu:AutoLayout Orientation="Vertical"
+                              Spacing="12"
+                              Padding="20"
+                              CounterAxisAlignment="Stretch">
+                <TextBlock Text="Holdings"
+                           Style="{StaticResource TitleSmall}"
+                           Foreground="{ThemeResource OnSurfaceBrush}" />
+                <ItemsRepeater ItemsSource="{Binding Holdings}">
+                  <ItemsRepeater.Layout>
+                    <StackLayout Orientation="Vertical" Spacing="10" />
+                  </ItemsRepeater.Layout>
+                  <ItemsRepeater.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="64" />
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="64" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Ticker}"
+                                   Style="{StaticResource LabelLarge}"
+                                   Foreground="{ThemeResource OnSurfaceBrush}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Company}"
+                                   Style="{StaticResource BodyMedium}"
+                                   Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding Price}"
+                                   Style="{StaticResource BodyMedium}"
+                                   Foreground="{ThemeResource OnSurfaceBrush}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3"
+                                   Text="{Binding Change}"
+                                   Style="{StaticResource LabelMedium}"
+                                   Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                   TextAlignment="Right"
+                                   VerticalAlignment="Center" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+              </utu:AutoLayout>
+            </DataTemplate>
+          </utu:CardContentControl.ContentTemplate>
+        </utu:CardContentControl>
+
+        <Button Content="Signal widget"
+                HorizontalAlignment="Left"
+                Style="{StaticResource OutlinedButtonStyle}"
+                Command="{Binding GoToSignals}" />
+
+      </utu:AutoLayout>
+    </ScrollViewer>
   </Grid>
 </Page>
