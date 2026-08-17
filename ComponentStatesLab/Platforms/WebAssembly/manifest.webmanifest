@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "ComponentStatesLab",
+  "display": "standalone",
+  "name": "ComponentStatesLab",
+  "short_name": "ComponentStatesLab",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}
