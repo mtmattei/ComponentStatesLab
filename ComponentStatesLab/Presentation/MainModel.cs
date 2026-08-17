@@ -17,20 +17,15 @@ public partial record MainModel
         Portfolio = portfolio;
 
         Title = "Portfolio";
-
-        Performance = new PerformanceMetric(
-            Label: "Total return",
-            Value: "+18.4%",
-            Caption: "Trailing 12 months",
-            IsUp: true);
     }
 
     private IPortfolioService Portfolio { get; }
 
     public string Title { get; }
 
-    /// <summary>Headline metric for the performance card. Plain data, always present.</summary>
-    public PerformanceMetric Performance { get; }
+    /// <summary>Headline metric for the performance card. Null data surfaces as None.</summary>
+    public IFeed<PerformanceMetric> Performance =>
+        Feed.Async<PerformanceMetric>(async ct => (await Portfolio.GetPerformanceAsync(ct))!);
 
     /// <summary>Backs the account header widget, which is wired through FeedView.</summary>
     public IFeed<AccountSummary> Account =>

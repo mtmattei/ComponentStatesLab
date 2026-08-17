@@ -102,6 +102,24 @@ public class PortfolioService : IPortfolioService
         return new AccountSummary("Growth Account", "$184,320.55", "+$1,204.18 today", IsUp: true);
     }
 
+    public async ValueTask<PerformanceMetric?> GetPerformanceAsync(CancellationToken ct = default)
+    {
+        Trace(nameof(GetPerformanceAsync));
+
+        await GateAsync(ct);
+
+        if (Mode == "empty")
+        {
+            return null;
+        }
+
+        return new PerformanceMetric(
+            Label: "Total return",
+            Value: "+18.4%",
+            Caption: "Trailing 12 months",
+            IsUp: true);
+    }
+
     public async ValueTask<IImmutableList<Sector>> GetSectorsAsync(CancellationToken ct = default)
     {
         Trace(nameof(GetSectorsAsync));

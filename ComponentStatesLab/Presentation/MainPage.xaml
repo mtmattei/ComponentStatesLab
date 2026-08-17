@@ -8,6 +8,22 @@
       NavigationCacheMode="Required"
       Background="{ThemeResource BackgroundBrush}">
 
+  <Page.Resources>
+    <!--
+      utu:Card has fixed slots, so its states cannot be swapped inside one shared shell the
+      way the holdings card's are - the Card element itself repeats per state. This style
+      keeps the identity single-sourced anyway, and pins the measured populated footprint
+      (332x113) so a shorter message in a slot cannot shrink the card.
+    -->
+    <Style x:Key="PerformanceCardStyle" TargetType="utu:Card" BasedOn="{StaticResource OutlinedCardStyle}">
+      <Setter Property="MinWidth" Value="332" />
+      <Setter Property="MinHeight" Value="113" />
+      <!-- The Card sizes to content; inside a FeedView it would otherwise centre, moving
+           it off the left edge it originally sat on. -->
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+  </Page.Resources>
+
   <Grid utu:SafeArea.Insets="VisibleBounds">
     <ScrollViewer>
       <utu:AutoLayout Orientation="Vertical"
@@ -107,15 +123,61 @@
 
         <!--
           TARGET 1 - performance card (Uno Toolkit Card).
-          Populated state only. No loading, empty, or error handling.
+          The Card, its style and its 332x113 footprint are invariants; only the slot
+          contents change per state.
         -->
-        <utu:Card Style="{StaticResource OutlinedCardStyle}"
-                  utu:AutoLayout.CounterAlignment="Stretch"
-                  HorizontalAlignment="Stretch"
-                  HorizontalContentAlignment="Stretch"
-                  HeaderContent="{Binding Performance.Value}"
-                  SubHeaderContent="{Binding Performance.Label}"
-                  SupportingContent="{Binding Performance.Caption}" />
+        <mvux:FeedView x:Name="PerformanceFeed"
+                       Source="{Binding Performance}"
+                       utu:AutoLayout.CounterAlignment="Stretch">
+          <mvux:FeedView.ValueTemplate>
+            <DataTemplate>
+              <utu:Card Style="{StaticResource PerformanceCardStyle}"
+                        HeaderContent="{Binding Data.Value}"
+                        SubHeaderContent="{Binding Data.Label}"
+                        SupportingContent="{Binding Data.Caption}" />
+            </DataTemplate>
+          </mvux:FeedView.ValueTemplate>
+
+          <!--
+            LOADING - a blank card holding the pinned footprint.
+            A skeleton is NOT possible here: utu:Card slots accept strings only. Assigning
+            a Border to a slot is silently dropped and the presenter falls back to showing
+            its DataContext, so the intended skeleton cannot be expressed with this control.
+            See the note above the ErrorTemplate.
+          -->
+          <mvux:FeedView.ProgressTemplate>
+            <DataTemplate>
+              <utu:Card Style="{StaticResource PerformanceCardStyle}" />
+            </DataTemplate>
+          </mvux:FeedView.ProgressTemplate>
+
+          <!-- EMPTY - a dash holds the metric's place; no CTA, nothing to create here. -->
+          <mvux:FeedView.NoneTemplate>
+            <DataTemplate>
+              <utu:Card Style="{StaticResource PerformanceCardStyle}"
+                        HeaderContent="&#8212;"
+                        SupportingContent="No performance data yet" />
+            </DataTemplate>
+          </mvux:FeedView.NoneTemplate>
+
+          <!--
+            ERROR - message only, and deliberately degraded.
+            utu:Card slots are string-only, so this state cannot carry the error-token
+            accent or a Retry button the way every other component on this page does.
+            An element placed in a slot is dropped and the slot renders its DataContext
+            instead - in the error case that is the raw exception, stack trace and all,
+            which also blew the card from 113px to 590px tall.
+            Full parity here needs utu:CardContentControl; that is a control swap, so it
+            is left as an open decision rather than done silently.
+          -->
+          <mvux:FeedView.ErrorTemplate>
+            <DataTemplate>
+              <utu:Card Style="{StaticResource PerformanceCardStyle}"
+                        HeaderContent="&#8212;"
+                        SupportingContent="Couldn't load performance" />
+            </DataTemplate>
+          </mvux:FeedView.ErrorTemplate>
+        </mvux:FeedView>
 
         <!--
           TARGET 2 - sector filter chips (Uno Toolkit ChipGroup).
@@ -127,18 +189,69 @@
           <TextBlock Text="Sectors"
                      Style="{StaticResource TitleSmall}"
                      Foreground="{ThemeResource OnSurfaceBrush}" />
-          <utu:ChipGroup ItemsSource="{Binding Sectors}"
-                         SelectionMode="Multiple"
-                         CanRemove="False"
-                         Style="{StaticResource FilterChipGroupStyle}">
-            <utu:ChipGroup.ItemTemplate>
+          <!-- MinHeight is the populated chip row, so the section keeps its 65px height. -->
+          <mvux:FeedView x:Name="SectorsFeed" Source="{Binding Sectors}" MinHeight="40">
+            <mvux:FeedView.ValueTemplate>
               <DataTemplate>
-                <utu:Chip Content="{Binding Name}"
-                          CanRemove="False"
-                          Style="{StaticResource FilterChipStyle}" />
+                <utu:ChipGroup ItemsSource="{Binding Data}"
+                               SelectionMode="Multiple"
+                               CanRemove="False"
+                               Style="{StaticResource FilterChipGroupStyle}">
+                  <utu:ChipGroup.ItemTemplate>
+                    <DataTemplate>
+                      <utu:Chip Content="{Binding Name}"
+                                CanRemove="False"
+                                Style="{StaticResource FilterChipStyle}" />
+                    </DataTemplate>
+                  </utu:ChipGroup.ItemTemplate>
+                </utu:ChipGroup>
               </DataTemplate>
-            </utu:ChipGroup.ItemTemplate>
-          </utu:ChipGroup>
+            </mvux:FeedView.ValueTemplate>
+
+            <!-- LOADING - four pills on the real chip widths and 8px gaps. -->
+            <mvux:FeedView.ProgressTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <Border Width="157" Height="32" CornerRadius="16"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                  <Border Width="153" Height="32" CornerRadius="16"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                  <Border Width="127" Height="32" CornerRadius="16"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                  <Border Width="148" Height="32" CornerRadius="16"
+                          Background="{ThemeResource OutlineVariantBrush}" />
+                </StackPanel>
+              </DataTemplate>
+            </mvux:FeedView.ProgressTemplate>
+
+            <!-- EMPTY - left aligned, matching where the chips themselves start. -->
+            <mvux:FeedView.NoneTemplate>
+              <DataTemplate>
+                <TextBlock Text="No sectors to filter by"
+                           Style="{StaticResource BodyMedium}"
+                           Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center" />
+              </DataTemplate>
+            </mvux:FeedView.NoneTemplate>
+
+            <mvux:FeedView.ErrorTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
+                  <TextBlock Text="Couldn't load sectors"
+                             Style="{StaticResource BodyMedium}"
+                             Foreground="{ThemeResource ErrorBrush}"
+                             VerticalAlignment="Center" />
+                  <Button Content="Retry"
+                          Style="{StaticResource TextButtonStyle}"
+                          Command="{Binding Refresh, ElementName=SectorsFeed}" />
+                </StackPanel>
+              </DataTemplate>
+            </mvux:FeedView.ErrorTemplate>
+          </mvux:FeedView>
         </utu:AutoLayout>
 
         <!--
