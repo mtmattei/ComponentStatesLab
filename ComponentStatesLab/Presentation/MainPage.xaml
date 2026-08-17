@@ -137,7 +137,9 @@
 
         <!--
           TARGET 3 - holdings list (ItemsRepeater inside a Toolkit CardContentControl).
-          Populated state only. No loading, empty, or error handling.
+          The card shell, its padding, the "Holdings" header and the 4-column row grid are
+          invariants: only the data region swaps between states, through the same FeedView
+          mechanism the account header above already uses.
         -->
         <utu:CardContentControl Style="{StaticResource OutlinedCardContentControlStyle}"
                                 utu:AutoLayout.CounterAlignment="Stretch">
@@ -150,45 +152,196 @@
                 <TextBlock Text="Holdings"
                            Style="{StaticResource TitleSmall}"
                            Foreground="{ThemeResource OnSurfaceBrush}" />
-                <ItemsRepeater ItemsSource="{Binding Holdings}">
-                  <ItemsRepeater.Layout>
-                    <StackLayout Orientation="Vertical" Spacing="10" />
-                  </ItemsRepeater.Layout>
-                  <ItemsRepeater.ItemTemplate>
+
+                <!-- MinHeight is the populated data region (5 rows x 17 + 4 x 10 spacing),
+                     so the card keeps its 196px footprint in every state. -->
+                <mvux:FeedView Source="{Binding Holdings}" MinHeight="125">
+                  <mvux:FeedView.ValueTemplate>
                     <DataTemplate>
-                      <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                          <ColumnDefinition Width="64" />
-                          <ColumnDefinition Width="*" />
-                          <ColumnDefinition Width="Auto" />
-                          <ColumnDefinition Width="64" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Ticker}"
-                                   Style="{StaticResource LabelLarge}"
-                                   Foreground="{ThemeResource OnSurfaceBrush}"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding Company}"
-                                   Style="{StaticResource BodyMedium}"
-                                   Foreground="{ThemeResource OnSurfaceVariantBrush}"
-                                   TextTrimming="CharacterEllipsis"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2"
-                                   Text="{Binding Price}"
-                                   Style="{StaticResource BodyMedium}"
-                                   Foreground="{ThemeResource OnSurfaceBrush}"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="3"
-                                   Text="{Binding Change}"
-                                   Style="{StaticResource LabelMedium}"
-                                   Foreground="{ThemeResource OnSurfaceVariantBrush}"
-                                   TextAlignment="Right"
-                                   VerticalAlignment="Center" />
-                      </Grid>
+                      <ItemsRepeater ItemsSource="{Binding Data}">
+                        <ItemsRepeater.Layout>
+                          <StackLayout Orientation="Vertical" Spacing="10" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                          <DataTemplate>
+                            <Grid ColumnSpacing="12">
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="64" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="64" />
+                              </Grid.ColumnDefinitions>
+                              <TextBlock Grid.Column="0"
+                                         Text="{Binding Ticker}"
+                                         Style="{StaticResource LabelLarge}"
+                                         Foreground="{ThemeResource OnSurfaceBrush}"
+                                         VerticalAlignment="Center" />
+                              <TextBlock Grid.Column="1"
+                                         Text="{Binding Company}"
+                                         Style="{StaticResource BodyMedium}"
+                                         Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                         TextTrimming="CharacterEllipsis"
+                                         VerticalAlignment="Center" />
+                              <TextBlock Grid.Column="2"
+                                         Text="{Binding Price}"
+                                         Style="{StaticResource BodyMedium}"
+                                         Foreground="{ThemeResource OnSurfaceBrush}"
+                                         VerticalAlignment="Center" />
+                              <TextBlock Grid.Column="3"
+                                         Text="{Binding Change}"
+                                         Style="{StaticResource LabelMedium}"
+                                         Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                         TextAlignment="Right"
+                                         VerticalAlignment="Center" />
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                      </ItemsRepeater>
                     </DataTemplate>
-                  </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
+                  </mvux:FeedView.ValueTemplate>
+
+                  <!-- LOADING - skeleton mirroring the real row count and column positions,
+                       using the same Border/CornerRadius/OutlineVariantBrush idiom as the
+                       account header's ProgressTemplate. -->
+                  <mvux:FeedView.ProgressTemplate>
+                    <DataTemplate>
+                      <utu:AutoLayout Orientation="Vertical"
+                                      Spacing="10"
+                                      CounterAxisAlignment="Stretch">
+                        <Grid ColumnSpacing="12" Height="17">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="64" />
+                          </Grid.ColumnDefinitions>
+                          <Border Grid.Column="0" Width="36" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="1" Width="90" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="2" Width="52" Height="10" CornerRadius="4"
+                                  VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="3" Width="33" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                        </Grid>
+                        <Grid ColumnSpacing="12" Height="17">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="64" />
+                          </Grid.ColumnDefinitions>
+                          <Border Grid.Column="0" Width="38" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="1" Width="110" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="2" Width="52" Height="10" CornerRadius="4"
+                                  VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="3" Width="33" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                        </Grid>
+                        <Grid ColumnSpacing="12" Height="17">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="64" />
+                          </Grid.ColumnDefinitions>
+                          <Border Grid.Column="0" Width="38" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="1" Width="98" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="2" Width="52" Height="10" CornerRadius="4"
+                                  VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="3" Width="30" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                        </Grid>
+                        <Grid ColumnSpacing="12" Height="17">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="64" />
+                          </Grid.ColumnDefinitions>
+                          <Border Grid.Column="0" Width="36" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="1" Width="120" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="2" Width="52" Height="10" CornerRadius="4"
+                                  VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="3" Width="33" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                        </Grid>
+                        <Grid ColumnSpacing="12" Height="17">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="64" />
+                          </Grid.ColumnDefinitions>
+                          <Border Grid.Column="0" Width="31" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="1" Width="82" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="2" Width="52" Height="10" CornerRadius="4"
+                                  VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                          <Border Grid.Column="3" Width="30" Height="10" CornerRadius="4"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="{ThemeResource OutlineVariantBrush}" />
+                        </Grid>
+                      </utu:AutoLayout>
+                    </DataTemplate>
+                  </mvux:FeedView.ProgressTemplate>
+
+                  <!-- EMPTY - successful absence. Neutral secondary text, no CTA: the app
+                       has no add-holding command to wire one to. -->
+                  <mvux:FeedView.NoneTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="No holdings yet"
+                                 Style="{StaticResource BodyMedium}"
+                                 Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" />
+                    </DataTemplate>
+                  </mvux:FeedView.NoneTemplate>
+
+                  <!-- ERROR - error token as an accent on the message only; Retry is wired
+                       to FeedView's own Refresh, same as the account header. -->
+                  <mvux:FeedView.ErrorTemplate>
+                    <DataTemplate>
+                      <utu:AutoLayout Orientation="Vertical"
+                                      Spacing="8"
+                                      PrimaryAxisAlignment="Center"
+                                      CounterAxisAlignment="Center">
+                        <TextBlock Text="Couldn't load holdings"
+                                   Style="{StaticResource BodyMedium}"
+                                   Foreground="{ThemeResource ErrorBrush}" />
+                        <Button Content="Retry"
+                                Style="{StaticResource TextButtonStyle}"
+                                Command="{Binding Refresh}" />
+                      </utu:AutoLayout>
+                    </DataTemplate>
+                  </mvux:FeedView.ErrorTemplate>
+                </mvux:FeedView>
               </utu:AutoLayout>
             </DataTemplate>
           </utu:CardContentControl.ContentTemplate>

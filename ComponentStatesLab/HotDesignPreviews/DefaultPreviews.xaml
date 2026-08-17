@@ -1,0 +1,14 @@
+<hd:PreviewGroup xmlns:cslp="using:ComponentStatesLab.Presentation" x:Class="ComponentStatesLab.DefaultPreviews"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:hd="using:Uno.UI.HotDesign"
+				 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				 mc:Ignorable="d">
+				 <hd:Preview PreviewName="MainPagePreview">
+				 		<cslp:MainPage />
+				 	</hd:Preview>
+      <hd:Preview PreviewName="BarePagePreview">
+      		<cslp:BarePage />
+      	</hd:Preview>
+</hd:PreviewGroup>
