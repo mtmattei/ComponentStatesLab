@@ -4,6 +4,7 @@
       xmlns:local="using:ComponentStatesLab.Presentation"
       xmlns:uen="using:Uno.Extensions.Navigation.UI"
       xmlns:utu="using:Uno.Toolkit.UI"
+      xmlns:mvux="using:Uno.Extensions.Reactive.UI"
       NavigationCacheMode="Required"
       Background="{ThemeResource BackgroundBrush}">
 
@@ -39,45 +40,136 @@
                          VerticalAlignment="Center" />
             </Grid>
 
-            <ItemsRepeater ItemsSource="{Binding Readings}">
-              <ItemsRepeater.Layout>
-                <StackLayout Orientation="Vertical" Spacing="16" />
-              </ItemsRepeater.Layout>
-              <ItemsRepeater.ItemTemplate>
+            <!-- MinHeight is the populated readings region (3 rows x 39 + 2 x 16 spacing),
+                 so the widget keeps its 226px height in every state. -->
+            <mvux:FeedView Source="{Binding Readings}" MinHeight="149">
+              <mvux:FeedView.ValueTemplate>
                 <DataTemplate>
-                  <StackPanel Spacing="6">
-                    <Grid>
-                      <TextBlock Text="{Binding Channel}"
-                                 Style="{StaticResource LabelMedium}"
-                                 Foreground="{ThemeResource OnSurfaceVariantBrush}"
-                                 VerticalAlignment="Bottom" />
-                      <StackPanel Orientation="Horizontal"
-                                  Spacing="4"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Bottom">
-                        <TextBlock Text="{Binding Value}"
-                                   Style="{StaticResource TitleLarge}"
-                                   Foreground="{ThemeResource OnSurfaceBrush}" />
-                        <TextBlock Text="{Binding Unit}"
-                                   Style="{StaticResource LabelSmall}"
-                                   Foreground="{ThemeResource OnSurfaceVariantBrush}"
-                                   VerticalAlignment="Bottom"
-                                   Margin="0,0,0,3" />
-                      </StackPanel>
-                    </Grid>
+                  <ItemsRepeater ItemsSource="{Binding Data}">
+                    <ItemsRepeater.Layout>
+                      <StackLayout Orientation="Vertical" Spacing="16" />
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                      <DataTemplate>
+                        <StackPanel Spacing="6">
+                          <Grid>
+                            <TextBlock Text="{Binding Channel}"
+                                       Style="{StaticResource LabelMedium}"
+                                       Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                       VerticalAlignment="Bottom" />
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="4"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom">
+                              <TextBlock Text="{Binding Value}"
+                                         Style="{StaticResource TitleLarge}"
+                                         Foreground="{ThemeResource OnSurfaceBrush}" />
+                              <TextBlock Text="{Binding Unit}"
+                                         Style="{StaticResource LabelSmall}"
+                                         Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                         VerticalAlignment="Bottom"
+                                         Margin="0,0,0,3" />
+                            </StackPanel>
+                          </Grid>
 
-                    <!-- strength track + fill -->
-                    <Grid HorizontalAlignment="Left">
-                      <Border Width="160" Height="6" CornerRadius="3"
-                              Background="{ThemeResource OutlineVariantBrush}" />
-                      <Border Width="{Binding FillWidth}" Height="6" CornerRadius="3"
-                              HorizontalAlignment="Left"
-                              Background="{ThemeResource PrimaryBrush}" />
-                    </Grid>
+                          <!-- strength track + fill -->
+                          <Grid HorizontalAlignment="Left">
+                            <Border Width="160" Height="6" CornerRadius="3"
+                                    Background="{ThemeResource OutlineVariantBrush}" />
+                            <Border Width="{Binding FillWidth}" Height="6" CornerRadius="3"
+                                    HorizontalAlignment="Left"
+                                    Background="{ThemeResource PrimaryBrush}" />
+                          </Grid>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                  </ItemsRepeater>
+                </DataTemplate>
+              </mvux:FeedView.ValueTemplate>
+
+              <!--
+                LOADING - three skeleton readings on the widget's own geometry. The strength
+                track is kept and simply left unfilled, which is the component's existing way
+                of showing "no signal here yet".
+              -->
+              <mvux:FeedView.ProgressTemplate>
+                <DataTemplate>
+                  <StackPanel Spacing="16">
+                    <StackPanel Spacing="6">
+                      <Grid Height="27">
+                        <Border Width="40" Height="10" CornerRadius="4"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                        <Border Width="64" Height="18" CornerRadius="4"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                      <Grid HorizontalAlignment="Left">
+                        <Border Width="160" Height="6" CornerRadius="3"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                      <Grid Height="27">
+                        <Border Width="48" Height="10" CornerRadius="4"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                        <Border Width="46" Height="18" CornerRadius="4"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                      <Grid HorizontalAlignment="Left">
+                        <Border Width="160" Height="6" CornerRadius="3"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                      <Grid Height="27">
+                        <Border Width="34" Height="10" CornerRadius="4"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                        <Border Width="52" Height="18" CornerRadius="4"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                      <Grid HorizontalAlignment="Left">
+                        <Border Width="160" Height="6" CornerRadius="3"
+                                Background="{ThemeResource OutlineVariantBrush}" />
+                      </Grid>
+                    </StackPanel>
                   </StackPanel>
                 </DataTemplate>
-              </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>
+              </mvux:FeedView.ProgressTemplate>
+
+              <!-- EMPTY - neutral, no CTA: the app has no command to add a channel. -->
+              <mvux:FeedView.NoneTemplate>
+                <DataTemplate>
+                  <TextBlock Text="No channels reporting"
+                             Style="{StaticResource BodyMedium}"
+                             Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center" />
+                </DataTemplate>
+              </mvux:FeedView.NoneTemplate>
+
+              <!-- ERROR - error token as an accent on the message only. -->
+              <mvux:FeedView.ErrorTemplate>
+                <DataTemplate>
+                  <StackPanel Spacing="8"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                    <TextBlock Text="Couldn't read the link"
+                               Style="{StaticResource BodyMedium}"
+                               Foreground="{ThemeResource ErrorBrush}"
+                               HorizontalAlignment="Center" />
+                    <Button Content="Retry"
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource TextButtonStyle}"
+                            Command="{Binding Refresh}" />
+                  </StackPanel>
+                </DataTemplate>
+              </mvux:FeedView.ErrorTemplate>
+            </mvux:FeedView>
 
           </StackPanel>
         </Border>

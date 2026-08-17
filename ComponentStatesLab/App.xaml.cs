@@ -87,9 +87,18 @@ public partial class App : Application
 
         Host = await MainWindow.InitializeNavigationAsync(
             () => Task.FromResult(builder.Build()),
-            initialRoute: "Main"
+            initialRoute: InitialRoute
         );
     }
+
+    /// <summary>
+    /// LAB_PAGE picks the page the lab opens on, so each target can be captured directly
+    /// without driving navigation. "bare" opens the signal widget; anything else opens Main.
+    /// </summary>
+    private static string InitialRoute =>
+        Environment.GetEnvironmentVariable("LAB_PAGE")?.ToLowerInvariant() == "bare"
+            ? "Signals"
+            : "Main";
 
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
