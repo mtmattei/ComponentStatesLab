@@ -42,7 +42,7 @@
 
             <!-- MinHeight is the populated readings region (3 rows x 39 + 2 x 16 spacing),
                  so the widget keeps its 226px height in every state. -->
-            <mvux:FeedView Source="{Binding Readings}" MinHeight="149">
+            <mvux:FeedView x:Name="ReadingsFeed" Source="{Binding Readings}" MinHeight="149">
               <mvux:FeedView.ValueTemplate>
                 <DataTemplate>
                   <ItemsRepeater ItemsSource="{Binding Data}">
@@ -162,10 +162,15 @@
                                Style="{StaticResource BodyMedium}"
                                Foreground="{ThemeResource ErrorBrush}"
                                HorizontalAlignment="Center" />
+                    <!--
+                      ElementName, not {Binding Refresh}: inside ErrorTemplate the
+                      DataContext is the thrown Exception, not FeedViewState, so a plain
+                      {Binding Refresh} silently resolves to null and the button is dead.
+                    -->
                     <Button Content="Retry"
                             HorizontalAlignment="Center"
                             Style="{StaticResource TextButtonStyle}"
-                            Command="{Binding Refresh}" />
+                            Command="{Binding Refresh, ElementName=ReadingsFeed}" />
                   </StackPanel>
                 </DataTemplate>
               </mvux:FeedView.ErrorTemplate>

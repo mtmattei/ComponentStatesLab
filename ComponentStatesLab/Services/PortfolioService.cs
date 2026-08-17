@@ -14,8 +14,74 @@ namespace ComponentStatesLab.Services;
 /// </summary>
 public class PortfolioService : IPortfolioService
 {
-    private static string Mode =>
-        Environment.GetEnvironmentVariable("LAB_MODE")?.ToLowerInvariant() ?? "data";
+    /// <summary>
+    /// Mode file, rewritable while the app runs. This is what makes recovery testable:
+    /// drive a component into Error, flip the file to "data", press Retry, and the
+    /// transition back proves the command actually re-ran the data path. It defaults to a
+    /// fixed temp path so a run launched without environment variables (the App MCP, for
+    /// example) can still be driven.
+    /// </summary>
+    private static string ModeFile =>
+        Environment.GetEnvironmentVariable("LAB_MODE_FILE")
+        ?? System.IO.Path.Combine(System.IO.Path.GetTempPath(), "componentstateslab-mode.txt");
+
+    /// <summary>
+    /// LAB_MODE wins when set, so an env-driven launch is never disturbed by a stale mode
+    /// file; the file is the fallback for launches that carry no environment.
+    /// </summary>
+    private static string Mode
+    {
+        get
+        {
+            var env = Environment.GetEnvironmentVariable("LAB_MODE");
+
+            if (!string.IsNullOrEmpty(env))
+            {
+                return env.ToLowerInvariant();
+            }
+
+            try
+            {
+                if (System.IO.File.Exists(ModeFile))
+                {
+                    return System.IO.File.ReadAllText(ModeFile).Trim().ToLowerInvariant();
+                }
+            }
+            catch
+            {
+                // fall through to the default
+            }
+
+            return "data";
+        }
+    }
+
+    /// <summary>Appends one line per service call, so retries can be counted.</summary>
+    private static void Trace(string operation)
+    {
+        var path = Environment.GetEnvironmentVariable("LAB_TRACE");
+
+        if (string.IsNullOrEmpty(path))
+        {
+            // only trace when the lab is actively driving the app
+            if (!System.IO.File.Exists(ModeFile))
+            {
+                return;
+            }
+
+            path = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(), "componentstateslab-trace.txt");
+        }
+
+        try
+        {
+            System.IO.File.AppendAllText(path, $"{DateTime.Now:HH:mm:ss.fff}\t{operation}\t{Mode}\n");
+        }
+        catch
+        {
+            // tracing must never affect the run
+        }
+    }
 
     private static async ValueTask GateAsync(CancellationToken ct)
     {
@@ -29,6 +95,8 @@ public class PortfolioService : IPortfolioService
 
     public async ValueTask<AccountSummary> GetAccountSummaryAsync(CancellationToken ct = default)
     {
+        Trace(nameof(GetAccountSummaryAsync));
+
         await GateAsync(ct);
 
         return new AccountSummary("Growth Account", "$184,320.55", "+$1,204.18 today", IsUp: true);
@@ -36,6 +104,8 @@ public class PortfolioService : IPortfolioService
 
     public async ValueTask<IImmutableList<Sector>> GetSectorsAsync(CancellationToken ct = default)
     {
+        Trace(nameof(GetSectorsAsync));
+
         await GateAsync(ct);
 
         if (Mode == "empty")
@@ -52,6 +122,8 @@ public class PortfolioService : IPortfolioService
 
     public async ValueTask<IImmutableList<Holding>> GetHoldingsAsync(CancellationToken ct = default)
     {
+        Trace(nameof(GetHoldingsAsync));
+
         await GateAsync(ct);
 
         if (Mode == "empty")
@@ -69,6 +141,8 @@ public class PortfolioService : IPortfolioService
 
     public async ValueTask<IImmutableList<SignalReading>> GetSignalsAsync(CancellationToken ct = default)
     {
+        Trace(nameof(GetSignalsAsync));
+
         await GateAsync(ct);
 
         if (Mode == "empty")

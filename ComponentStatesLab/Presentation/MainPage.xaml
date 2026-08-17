@@ -26,7 +26,8 @@
           This widget is NOT a test target. It exists so the skill can discover that
           FeedView (with all four templates) is how this app expresses async state.
         -->
-        <mvux:FeedView Source="{Binding Account}"
+        <mvux:FeedView x:Name="AccountFeed"
+                       Source="{Binding Account}"
                        utu:AutoLayout.CounterAlignment="Stretch">
           <mvux:FeedView.ValueTemplate>
             <DataTemplate>
@@ -89,10 +90,15 @@
                   <TextBlock Text="Couldn't load this account"
                              Style="{StaticResource BodyMedium}"
                              Foreground="{ThemeResource ErrorBrush}" />
+                  <!--
+                    ElementName, not {Binding Refresh}: inside ErrorTemplate the DataContext
+                    is the thrown Exception, not FeedViewState, so a plain {Binding Refresh}
+                    silently resolves to null and leaves a dead button.
+                  -->
                   <Button Content="Retry"
                           HorizontalAlignment="Left"
                           Style="{StaticResource TextButtonStyle}"
-                          Command="{Binding Refresh}" />
+                          Command="{Binding Refresh, ElementName=AccountFeed}" />
                 </utu:AutoLayout>
               </Border>
             </DataTemplate>
@@ -155,7 +161,7 @@
 
                 <!-- MinHeight is the populated data region (5 rows x 17 + 4 x 10 spacing),
                      so the card keeps its 196px footprint in every state. -->
-                <mvux:FeedView Source="{Binding Holdings}" MinHeight="125">
+                <mvux:FeedView x:Name="HoldingsFeed" Source="{Binding Holdings}" MinHeight="125">
                   <mvux:FeedView.ValueTemplate>
                     <DataTemplate>
                       <ItemsRepeater ItemsSource="{Binding Data}">
@@ -337,7 +343,7 @@
                                    Foreground="{ThemeResource ErrorBrush}" />
                         <Button Content="Retry"
                                 Style="{StaticResource TextButtonStyle}"
-                                Command="{Binding Refresh}" />
+                                Command="{Binding Refresh, ElementName=HoldingsFeed}" />
                       </utu:AutoLayout>
                     </DataTemplate>
                   </mvux:FeedView.ErrorTemplate>
