@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "InventoryCardLab",
+  "display": "standalone",
+  "name": "InventoryCardLab",
+  "short_name": "InventoryCardLab",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}
