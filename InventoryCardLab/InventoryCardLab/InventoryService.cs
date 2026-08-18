@@ -8,14 +8,15 @@ public interface IInventoryService
 /// <summary>
 /// Simulated warehouse inventory source. The mode file is re-read on every call so
 /// each state (data / slow / empty / error) can be forced at runtime without a restart:
-///   %TEMP%\InventoryCardLab.mode  containing one of: data | slow | empty | error
-/// Every call appends a line to %TEMP%\InventoryCardLab.trace so a Retry can be
-/// proven to have re-run the service.
+///   .states\mode.txt (beside the sln) containing one of: data | slow | empty | error
+/// Every call appends a line to .states\trace.txt so a Retry can be proven to have
+/// re-run the service.
 /// </summary>
 public sealed class InventoryService : IInventoryService
 {
-    private static readonly string ModeFile = Path.Combine(Path.GetTempPath(), "InventoryCardLab.mode");
-    private static readonly string TraceFile = Path.Combine(Path.GetTempPath(), "InventoryCardLab.trace");
+    private static readonly string FixtureDir = @"C:\Users\Platform006\ComponentStatesLab\InventoryCardLab\.states";
+    private static readonly string ModeFile = Path.Combine(FixtureDir, "mode.txt");
+    private static readonly string TraceFile = Path.Combine(FixtureDir, "trace.txt");
 
     private static readonly ImmutableList<InventoryItem> Items = ImmutableList.Create(
         new InventoryItem("WH-1042", "M8 Hex Bolts (box of 100)", 218, 50),
@@ -29,7 +30,7 @@ public sealed class InventoryService : IInventoryService
         var mode = ReadMode();
         Trace(mode);
 
-        await Task.Delay(mode == "slow" ? TimeSpan.FromSeconds(6) : TimeSpan.FromMilliseconds(800), ct);
+        await Task.Delay(mode == "slow" ? TimeSpan.FromSeconds(30) : TimeSpan.FromMilliseconds(800), ct);
 
         return mode switch
         {

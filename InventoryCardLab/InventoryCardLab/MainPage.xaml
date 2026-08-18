@@ -47,8 +47,11 @@
         </Grid>
 
         <!-- Data region: FeedView swaps between value / progress / none / error -->
+        <!-- MinHeight pins the populated footprint (5 rows x 59px, measured at runtime)
+             so Empty/Error don't collapse the card. -->
         <mvux:FeedView x:Name="StockFeed"
-                       Source="{Binding Stock}">
+                       Source="{Binding Stock}"
+                       MinHeight="295">
           <mvux:FeedView.ValueTemplate>
             <DataTemplate>
               <ItemsControl ItemsSource="{Binding Data}">
@@ -88,6 +91,91 @@
               </ItemsControl>
             </DataTemplate>
           </mvux:FeedView.ValueTemplate>
+
+          <!-- Loading: static skeleton mirroring the populated rows (59px each).
+               No storyboard: RepeatBehavior=Forever pumps the Skia compositor. -->
+          <mvux:FeedView.ProgressTemplate>
+            <DataTemplate>
+              <StackPanel AutomationProperties.AccessibilityView="Raw">
+                <StackPanel.Resources>
+                  <Style x:Key="SkeletonBar" TargetType="Border">
+                    <Setter Property="Background" Value="{ThemeResource ControlStrongFillColorDisabledBrush}" />
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                  </Style>
+                  <DataTemplate x:Key="SkeletonRow">
+                    <Grid Padding="0,10" ColumnSpacing="12">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="52" />
+                      </Grid.ColumnDefinitions>
+                      <StackPanel Spacing="2">
+                        <Border Style="{StaticResource SkeletonBar}" Width="156" Height="12" Margin="0,4" />
+                        <Border Style="{StaticResource SkeletonBar}" Width="56" Height="10" Margin="0,4,0,3" />
+                      </StackPanel>
+                      <Border Grid.Column="1"
+                              Style="{StaticResource SkeletonBar}"
+                              Width="28" Height="12"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </StackPanel.Resources>
+                <ContentControl ContentTemplate="{StaticResource SkeletonRow}" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                <ContentControl ContentTemplate="{StaticResource SkeletonRow}" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                <ContentControl ContentTemplate="{StaticResource SkeletonRow}" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                <ContentControl ContentTemplate="{StaticResource SkeletonRow}" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                <ContentControl ContentTemplate="{StaticResource SkeletonRow}" HorizontalContentAlignment="Stretch" IsTabStop="False" />
+              </StackPanel>
+            </DataTemplate>
+          </mvux:FeedView.ProgressTemplate>
+
+          <!-- Empty: successful absence, not an error. No CTA: the app has no add-item flow. -->
+          <mvux:FeedView.NoneTemplate>
+            <DataTemplate>
+              <StackPanel HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Spacing="4">
+                <FontIcon Glyph="&#xE7B8;"
+                          FontSize="20"
+                          Margin="0,0,0,4"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Text="No items in this warehouse yet"
+                           HorizontalAlignment="Center"
+                           AutomationProperties.LiveSetting="Polite" />
+                <TextBlock Text="Stock appears here once inventory is received."
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+              </StackPanel>
+            </DataTemplate>
+          </mvux:FeedView.NoneTemplate>
+
+          <!-- Error: DataContext here is the thrown Exception, so Retry must bind
+               to the FeedView's Refresh via ElementName - {Binding Refresh} is dead. -->
+          <mvux:FeedView.ErrorTemplate>
+            <DataTemplate>
+              <StackPanel HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Spacing="4">
+                <FontIcon Glyph="&#xEA39;"
+                          FontSize="20"
+                          Margin="0,0,0,4"
+                          Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                <TextBlock Text="Couldn't load stock levels"
+                           HorizontalAlignment="Center"
+                           AutomationProperties.LiveSetting="Polite" />
+                <TextBlock Text="Check the connection and try again."
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Button Content="Retry"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Center"
+                        Command="{Binding Refresh, ElementName=StockFeed}" />
+              </StackPanel>
+            </DataTemplate>
+          </mvux:FeedView.ErrorTemplate>
         </mvux:FeedView>
 
       </StackPanel>
