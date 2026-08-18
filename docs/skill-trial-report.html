@@ -405,7 +405,7 @@
         </ul>
         <div class="note">
           <span class="label">Flaw found in our own guidance</span>
-          The recommended skeleton animation keeps the renderer running permanently, even once hidden — <span class="measure">15–21%</span> of a CPU core, forever. The replacement costs about <span class="measure">1%</span>. Nothing in the framework warns you about this either.
+          The animation the guidance recommended for the loading skeleton is expensive, and hiding the skeleton does not stop it. An isolated test app measured <span class="measure">29%</span> of a CPU core while running, and still <span class="measure">17%</span> once the animated element was hidden — indefinitely, with nothing visible on screen. Stopping the animation properly returns it to <span class="measure">0.3%</span>. Nothing in the framework warns you about this, which is why it is now filed as a bug against it.
         </div>
       </article>
 
@@ -473,7 +473,7 @@
       <li>Rewrote the rules to fit any app style and design system, not just one.</li>
       <li>Added a self-check the agent runs before calling the work done.</li>
       <li>Added five missing rules — refresh keeps data, retry can't double-fire, no skeleton flash on fast loads, announce changes for screen readers, paged lists out of scope.</li>
-      <li>Replaced the animation advice that cost 15–21% of a core.</li>
+      <li>Replaced the animation advice, and corrected it a second time when an isolated test showed the original measurement had been distorted by leftover app instances.</li>
       <li>Added a check that runs first: <strong>does this component have states at all?</strong> A static header or a decorative card has none, and the old wording would have had the agent invent a data source to give it some.</li>
       <li>Split "empty" into the kinds that actually differ — nothing yet, nothing matched, nothing right now — because they need different words and different actions.</li>
     </ul>
@@ -486,7 +486,8 @@
       <li><strong>Running the app beats reviewing the code.</strong> The dead button, the unreachable state and the CPU cost were all invisible in source and screenshots.</li>
       <li><strong>Testing guidance improves guidance.</strong> Four fixes exist only because output was correct by the rules as written and still wrong in practice — the latest when Run 5 hit a rule its mechanism physically could not satisfy, and said so instead of faking it.</li>
       <li><strong>Knowing when to do nothing is part of the job.</strong> Run 4's value is that the agent declined work it was loosely asked to do, and explained why.</li>
-      <li><strong>Two findings are worth passing to the framework team</strong> regardless of what anyone concludes about the skill: the silently dead button, and an animation default that never lets the renderer sleep.</li>
+      <li><strong>Two findings went back to the framework team</strong> regardless of what anyone concludes about the skill — both are now filed with isolated reproductions: a Retry button that compiles, looks enabled and does nothing (<a href="https://github.com/unoplatform/uno.extensions/issues/3141">uno.extensions#3141</a>), and an animation that keeps burning CPU after its element is hidden (<a href="https://github.com/unoplatform/uno/issues/24098">uno#24098</a>).</li>
+      <li><strong>Measure twice before you publish.</strong> Building an isolated reproduction for that second finding overturned our own earlier number — the original was distorted by leftover app instances. The corrected figures are in the issue.</li>
     </ul>
   </section>
 

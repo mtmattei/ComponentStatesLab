@@ -54,3 +54,8 @@ log (paths in the service source; modes are `slow` / `empty` / `error`).
   402x208 in both data and error.
 - `PartsFinderLab` — mixed page; correctly gave states to only 2 of 4 regions, two empty variants by cause, warehouse Retry proven. Agent confirmed Phase 0 drove the skip decisions.
 - `InventoryCardLab` — build-from-scratch path. Populated card and states landed as two separate commits (the states commit touches only the templates), Retry proven, 378x295 in data and error. Surfaced that FeedView has no hook for the skeleton-flash delay; skill now says to put it in the data layer or declare the gap.
+
+## Framework issues filed from this work
+
+- [uno.extensions#3141](https://github.com/unoplatform/uno.extensions/issues/3141) — `{Binding Refresh}` inside `FeedView.ErrorTemplate` binds against the thrown `Exception`, so Retry renders enabled and does nothing. Workaround is the `ElementName` form.
+- [uno#24098](https://github.com/unoplatform/uno/issues/24098) — a `RepeatBehavior="Forever"` storyboard keeps consuming ~17% of a core while its target is `Collapsed`. Isolated repro: `PulseCpuRepro` (run the exe with no args / `--pulse` / `--pulse-hide` / `--pulse-stop` and sample CPU).
