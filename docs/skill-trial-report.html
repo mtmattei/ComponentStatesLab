@@ -159,7 +159,16 @@
 
   .tile .score.pass { color: var(--pass); }
   .tile .score.fail { color: var(--fail); }
-  .tile .what { font-size: 14.5px; color: var(--ink-muted); }
+  .tile .what { font-size: 14px; color: var(--ink-muted); line-height: 1.45; }
+
+  .tile .denom { font-size: 15px; color: var(--ink-muted); font-weight: 500; }
+
+  .board-note {
+    font-size: 14.5px;
+    color: var(--ink-muted);
+    max-width: 68ch;
+    margin: -22px 0 0;
+  }
 
   /* Run rows */
   .runs { display: flex; flex-direction: column; gap: 14px; }
@@ -288,19 +297,6 @@
     max-width: 66ch;
   }
 
-  .qa { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--rule); }
-
-  .q {
-    padding: 15px 0;
-    border-bottom: 1px solid var(--rule);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .q h3 { color: var(--accent); font-size: 16px; max-width: 62ch; text-wrap: balance; }
-  .q p { font-size: 15.5px; }
-
   footer { color: var(--ink-muted); font-size: 15px; display: flex; flex-direction: column; gap: 8px; }
   footer h2 { color: var(--ink); }
 
@@ -319,30 +315,34 @@
   <div class="board">
     <div class="tile">
       <span class="who">Run 1 · control</span>
-      <span class="score fail">0/5</span>
-      <span class="what">Guidance not applied</span>
+      <span class="score fail">1<span class="denom">/4</span></span>
+      <span class="what">states usable — guidance not applied</span>
     </div>
     <div class="tile">
       <span class="who">Run 2 · plain app</span>
-      <span class="score pass">5/5</span>
-      <span class="what">Fresh agent, one-line request</span>
+      <span class="score pass">4<span class="denom">/4</span></span>
+      <span class="what">states usable — and found a flaw in our guidance</span>
     </div>
     <div class="tile">
       <span class="who">Run 3 · custom styles</span>
-      <span class="score pass">5/5</span>
-      <span class="what">Fresh agent, no standard library</span>
+      <span class="score pass">4<span class="denom">/4</span></span>
+      <span class="what">states usable — no standard library to lean on</span>
     </div>
     <div class="tile">
       <span class="who">Run 4 · mixed page</span>
-      <span class="score pass">5/5</span>
-      <span class="what">Correctly left 2 of 4 regions alone</span>
+      <span class="score pass">7<span class="denom">/7</span></span>
+      <span class="what">states usable across two regions — and two regions correctly left alone</span>
     </div>
     <div class="tile">
       <span class="who">Run 5 · from scratch</span>
-      <span class="score pass">5/5</span>
-      <span class="what">Built the card first, then the states</span>
+      <span class="score pass">4<span class="denom">/4</span></span>
+      <span class="what">states usable — card built first, then transformed</span>
     </div>
   </div>
+
+  <p class="board-note">A state counts as usable only if it can be reached in the running app and its buttons do what they claim. Run 1's data state worked; its loading state was a spinner on a blank page, its empty state could never appear, and its error state offered a Retry button wired to nothing.</p>
+
+  <hr class="divider" />
 
   <section>
     <h2>The idea</h2>
@@ -351,16 +351,25 @@
   </section>
 
   <section>
-    <h2>The test</h2>
-    <p>Build an app with a component that only shows data. Hand it to a fresh agent with a plain request — "add loading, empty and error states" — and no mention of the skill, since whether it gets found is part of the measurement. Then grade it.</p>
+    <h2>How the test works</h2>
+    <p>Build an app with a component that only shows data. Hand it to a fresh agent with a plain request — "add loading, empty and error states" — and no mention of the skill, since whether it gets found is part of the measurement. Then grade what comes back.</p>
+
+    <h3>What we look for in the code</h3>
     <ol class="checks">
       <li>Does the retry button connect to something real?</li>
-      <li>Do all four states sit inside the same card?</li>
+      <li>Do all the states sit inside the same card?</li>
       <li>Is loading a skeleton of the real layout, not a spinner?</li>
       <li>Is the size pinned, so the card doesn't shrink?</li>
       <li>Can the empty state be reached at all?</li>
     </ol>
-    <p>Then two things code can't tell you: measure the card in every state, and prove retry re-runs the request by breaking the data source, repairing it live, and clicking.</p>
+    <p>These checks came from defects we had already seen, which means they prove the skill fixes <em>known</em> problems rather than that it produces good states in general. What keeps them honest is that each one is mechanical: does clicking retry produce a second request, yes or no. None of them are "does this look right".</p>
+
+    <h3>Then we run it</h3>
+    <p>Code review cannot answer the two questions that matter most, so each run ends in the live app: measure the card in every state, and prove retry re-runs the request by breaking the data source, repairing it while the app is still running, and clicking.</p>
+    <p>I did that verification myself rather than taking each agent's word for it — driving the states, clicking the buttons, and reading the service log to confirm a second request actually happened. The one exception is Run 2, where I relied partly on the agent's own report, and independently measured the performance problem it introduced.</p>
+
+    <h3>What it costs</h3>
+    <p>Between <span class="measure">140k</span> and <span class="measure">205k</span> tokens per run, at <span class="measure">13</span> to <span class="measure">26</span> minutes each, unattended. Building each test app took roughly an hour of my time. The skill itself is a single file, revised in place.</p>
   </section>
 
   <section>
@@ -370,20 +379,24 @@
       <article class="run">
         <div class="run-head">
           <h3>Run 1 — product card, states generated elsewhere</h3>
-          <span class="pill fail">0 of 5</span>
+          <span class="pill fail">1 of 4 usable</span>
         </div>
         <ul>
           <li><strong>Retry was dead.</strong> Repaired the data source, clicked, nothing happened.</li>
           <li><strong>Empty was unreachable</strong> — the code treated "no data" as a failure, so it showed an error instead.</li>
           <li>Loading was a spinner on a blank page; no shared card.</li>
         </ul>
-        <p>One working state out of four, in an app that looked finished.</p>
+        <p>This one came from a different tool, so it shows what the output looks like without the guidance applied. It is not the same agent with and without the skill — that comparison is still owed, and it is the first thing a skeptic should ask for.</p>
+        <div class="note">
+          <span class="label">Worth separating: platform problem, not skill problem</span>
+          The dead button is a trap in the UI framework. In an error template the data context is the exception object, so the obvious binding silently resolves to nothing — it compiles, renders enabled, and does nothing when clicked. The skill documents the workaround, but this is worth fixing or warning about upstream.
+        </div>
       </article>
 
       <article class="run">
         <div class="run-head">
           <h3>Run 2 — orders panel, different app style</h3>
-          <span class="pill pass">5 of 5</span>
+          <span class="pill pass">4 of 4 usable</span>
         </div>
         <ul>
           <li>Agent found and applied the skill on its own.</li>
@@ -391,15 +404,15 @@
           <li>Retry driven and confirmed working.</li>
         </ul>
         <div class="note">
-          <span class="label">Defect found in our own guidance</span>
-          The recommended skeleton animation keeps the renderer running permanently, even once hidden — <span class="measure">15–21%</span> of a CPU core, forever. The replacement costs about <span class="measure">1%</span>.
+          <span class="label">Flaw found in our own guidance</span>
+          The recommended skeleton animation keeps the renderer running permanently, even once hidden — <span class="measure">15–21%</span> of a CPU core, forever. The replacement costs about <span class="measure">1%</span>. Nothing in the framework warns you about this either.
         </div>
       </article>
 
       <article class="run">
         <div class="run-head">
           <h3>Run 3 — departure board, hand-made design system</h3>
-          <span class="pill pass">5 of 5</span>
+          <span class="pill pass">4 of 4 usable</span>
         </div>
         <ul>
           <li>No standard component library to fall back on; it used the app's own styles throughout.</li>
@@ -412,7 +425,7 @@
       <article class="run">
         <div class="run-head">
           <h3>Run 4 — mixed page, four regions</h3>
-          <span class="pill pass">5 of 5</span>
+          <span class="pill pass">7 of 7 usable</span>
         </div>
         <p>A page holding a static header, a static legend card, a one-record summary strip, and a search-fed list. The request said "the page's components", which naively means all four. The right answer is that two of them have no states at all.</p>
         <ul>
@@ -430,7 +443,7 @@
       <article class="run">
         <div class="run-head">
           <h3>Run 5 — nothing to start from</h3>
-          <span class="pill pass">5 of 5</span>
+          <span class="pill pass">4 of 4 usable</span>
         </div>
         <p>An empty project and one sentence: build a stock levels card <em>with</em> loading, empty and error states. This is the request that produced Run 1's failure, because designing all four at once is how you end up with four unrelated screens. The rule is that it's two jobs: build the card, finish it, then transform it.</p>
         <ul>
@@ -454,9 +467,9 @@
   </section>
 
   <section>
-    <h2>What we changed</h2>
+    <h2>What we changed in the skill</h2>
     <ul>
-      <li>Moved the six non-negotiable rules to the top, so a partial read still catches them.</li>
+      <li>Moved the non-negotiable rules to the top, so a partial read still catches them.</li>
       <li>Rewrote the rules to fit any app style and design system, not just one.</li>
       <li>Added a self-check the agent runs before calling the work done.</li>
       <li>Added five missing rules — refresh keeps data, retry can't double-fire, no skeleton flash on fast loads, announce changes for screen readers, paged lists out of scope.</li>
@@ -467,65 +480,25 @@
   </section>
 
   <section>
-    <h2>Conclusions</h2>
+    <h2>What it shows</h2>
     <ul>
       <li><strong>Guidance changes output when it's read.</strong> Four agents, one-line requests, no hint a skill existed — all correct, on app styles the guidance was never written for.</li>
       <li><strong>Running the app beats reviewing the code.</strong> The dead button, the unreachable state and the CPU cost were all invisible in source and screenshots.</li>
-      <li><strong>Testing guidance improves guidance.</strong> Four fixes exist only because output was correct by the rules as written, and still wrong in practice — the latest when Run 5 hit a rule its mechanism physically could not satisfy, and said so instead of faking it.</li>
+      <li><strong>Testing guidance improves guidance.</strong> Four fixes exist only because output was correct by the rules as written and still wrong in practice — the latest when Run 5 hit a rule its mechanism physically could not satisfy, and said so instead of faking it.</li>
       <li><strong>Knowing when to do nothing is part of the job.</strong> Run 4's value is that the agent declined work it was loosely asked to do, and explained why.</li>
+      <li><strong>Two findings are worth passing to the framework team</strong> regardless of what anyone concludes about the skill: the silently dead button, and an animation default that never lets the renderer sleep.</li>
     </ul>
   </section>
 
   <hr class="divider" />
 
-  <section>
-    <h2>Questions you should expect</h2>
-    <div class="qa">
-
-      <div class="q">
-        <h3>Run 1 came from a different tool. How do you know the skill caused the difference?</h3>
-        <p>From Run 1 alone, we don't. It shows what the failure looks like, not that the skill fixed it. The evidence sits in Runs 2 and 3: the agent found the skill from a one-line request and produced things it had no reason to invent — pinning the card to a measured number, and building a state-forcing switch nobody asked for. <strong>The clean A/B — same fixture, same agent, skill withheld — hasn't been run.</strong> It's the obvious next step and costs about an hour.</p>
-      </div>
-
-      <div class="q">
-        <h3>Five runs, and agents aren't deterministic. Would it pass again?</h3>
-        <p>Unknown — one run per fixture, no repeats. What makes it more than luck is that the four passes were on different app styles and the agent chose a <em>different</em> implementation mechanism each time, so it isn't one memorised path. The fixtures are committed, so re-running is cheap.</p>
-      </div>
-
-      <div class="q">
-        <h3>What hasn't been tested at all?</h3>
-        <p>Every mechanism and entry point the guidance describes has now had at least one run, including the build-from-scratch path in Run 5, which was the last gap. What remains untested is consistency (no repeats) and the same-agent A/B. Paged lists — "loading more" at the bottom of a list — are deliberately out of scope, and the guidance says so rather than guessing.</p>
-      </div>
-
-      <div class="q">
-        <h3>You wrote the checks from failures you'd already seen. Isn't that circular?</h3>
-        <p>The checks do come from real defects, which is the right direction — but it means they prove the skill fixes <em>known</em> problems, not that it produces good states generally. What keeps it honest is that every check is mechanical and falsifiable: does clicking retry produce a second request, yes or no. None of them are "does this look right."</p>
-      </div>
-
-      <div class="q">
-        <h3>The agent built the fixture it was graded on. Who checked the work?</h3>
-        <p>I did, separately from the agent's own report. For Run 3 I drove each state myself, clicked retry, read the service log to confirm a second request, and measured the card in the running app. Run 1 the same. For Run 2 I relied partly on the agent's report — and independently measured the CPU problem it introduced, which is how that defect surfaced.</p>
-      </div>
-
-      <div class="q">
-        <h3>What did it cost?</h3>
-        <p>About <span class="measure">140k</span> and <span class="measure">170k</span> tokens per run, at <span class="measure">13</span> and <span class="measure">17</span> minutes each, unattended. Building each fixture took roughly an hour of my time. The skill itself is a single file, revised in place.</p>
-      </div>
-
-      <div class="q">
-        <h3>Is the dead retry button really a skill problem, or a platform one?</h3>
-        <p>Platform. In the error template, the data context is the exception object, so the obvious binding silently resolves to nothing — it compiles, renders enabled, and does nothing. The skill documents the workaround, but this is a footgun worth fixing or warning about upstream. Same for the animation cost in Run 2: nothing tells you the renderer stays awake.</p>
-      </div>
-
-    </div>
-  </section>
-
   <footer>
-    <h2>Not done yet</h2>
+    <h2>What this does not prove</h2>
     <ul>
-      <li>The same-agent A/B, with the skill withheld.</li>
-      <li>Repeat runs on the committed fixtures, to test consistency.</li>
-      <li>Screen-reader check on the announcements — they're in the code, unverified in practice.</li>
+      <li>One run per app, no repeats — and agents are not deterministic. What makes it more than luck is that the four passes were on different app styles and the agent picked a <em>different</em> implementation each time, so it isn't one memorised path. The test apps are committed, so re-running is cheap.</li>
+      <li>No same-agent comparison with the skill withheld. Runs 2 to 5 show agents finding the skill and producing things they had no reason to invent, but the clean A/B is still owed.</li>
+      <li>The screen-reader announcements are in the code and unverified in practice.</li>
+      <li>Paged lists — "loading more" at the bottom of a list — are deliberately out of scope, and the guidance says so rather than guessing.</li>
     </ul>
   </footer>
 
