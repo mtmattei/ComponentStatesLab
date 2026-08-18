@@ -9,7 +9,6 @@
     --ink-muted: #5A6875;
     --rule: #D5DCE0;
     --accent: #0E6E75;
-    --accent-soft: #DCEBEC;
     --pass: #2F7A4F;
     --pass-soft: #DFEDE4;
     --fail: #A8342A;
@@ -31,7 +30,6 @@
       --ink-muted: #9DAAB3;
       --rule: #334048;
       --accent: #4FB3B8;
-      --accent-soft: #1B3538;
       --pass: #6FBF8F;
       --pass-soft: #1C3227;
       --fail: #E38578;
@@ -49,7 +47,6 @@
     --ink-muted: #9DAAB3;
     --rule: #334048;
     --accent: #4FB3B8;
-    --accent-soft: #1B3538;
     --pass: #6FBF8F;
     --pass-soft: #1C3227;
     --fail: #E38578;
@@ -65,25 +62,25 @@
     background: var(--paper);
     color: var(--ink);
     font-family: var(--body);
-    font-size: 17px;
-    line-height: 1.65;
+    font-size: 16.5px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
   .wrap {
-    max-width: 780px;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 56px 24px 96px;
+    padding: 48px 24px 72px;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 34px;
   }
 
-  header { display: flex; flex-direction: column; gap: 14px; }
+  header { display: flex; flex-direction: column; gap: 10px; }
 
   .eyebrow {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 11.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--accent);
@@ -91,7 +88,7 @@
 
   h1 {
     font-family: var(--display);
-    font-size: clamp(32px, 5vw, 44px);
+    font-size: clamp(29px, 4.4vw, 38px);
     line-height: 1.15;
     font-weight: 700;
     margin: 0;
@@ -100,291 +97,293 @@
   }
 
   .dek {
-    font-size: 19px;
+    font-size: 18px;
     color: var(--ink-muted);
     margin: 0;
-    max-width: 60ch;
+    max-width: 58ch;
     text-wrap: balance;
   }
 
   h2 {
     font-family: var(--display);
-    font-size: 25px;
+    font-size: 21px;
     font-weight: 700;
-    margin: 0 0 4px;
+    margin: 0;
     text-wrap: balance;
   }
 
-  h3 {
-    font-family: var(--body);
-    font-size: 17px;
-    font-weight: 650;
-    margin: 0;
-  }
+  h3 { font-family: var(--body); font-size: 16px; font-weight: 650; margin: 0; }
 
-  section { display: flex; flex-direction: column; gap: 14px; }
+  section { display: flex; flex-direction: column; gap: 12px; }
 
-  p { margin: 0; max-width: 68ch; }
+  p { margin: 0; max-width: 66ch; }
 
-  ul, ol { margin: 0; padding-left: 22px; max-width: 68ch; display: flex; flex-direction: column; gap: 7px; }
+  ul { margin: 0; padding-left: 20px; max-width: 66ch; display: flex; flex-direction: column; gap: 6px; }
 
   strong { font-weight: 650; }
 
-  .summary {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    padding: 24px 26px;
-    display: flex;
-    flex-direction: column;
+  .divider { height: 1px; background: var(--rule); border: 0; margin: 0; }
+
+  /* Scoreboard */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 12px;
   }
 
-  .summary h2 { font-size: 20px; }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 
-  .divider { height: 1px; background: var(--rule); border: 0; margin: 0; }
+  .tile .who {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
 
-  /* Run cards */
-  .runs { display: flex; flex-direction: column; gap: 18px; }
+  .tile .score {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .tile .score.pass { color: var(--pass); }
+  .tile .score.fail { color: var(--fail); }
+  .tile .what { font-size: 14.5px; color: var(--ink-muted); }
+
+  /* Run rows */
+  .runs { display: flex; flex-direction: column; gap: 14px; }
 
   .run {
     background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: 4px;
-    padding: 22px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .run-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .run-id {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-    display: block;
-    margin-bottom: 3px;
-  }
-
-  .score {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    padding: 4px 11px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
-
-  .score.pass { background: var(--pass-soft); color: var(--pass); }
-  .score.fail { background: var(--fail-soft); color: var(--fail); }
-
-  .run-meta {
-    font-size: 14px;
-    color: var(--ink-muted);
-    font-family: var(--mono);
-  }
-
-  .note {
-    border-left: 2px solid var(--caught);
-    background: var(--caught-soft);
-    padding: 12px 16px;
-    border-radius: 0 3px 3px 0;
-    font-size: 15.5px;
-  }
-
-  .note .label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--caught);
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  /* Checks list */
-  .checks {
-    counter-reset: check;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    border-top: 1px solid var(--rule);
-  }
-
-  .checks li {
-    counter-increment: check;
-    display: flex;
-    gap: 14px;
-    padding: 11px 2px;
-    border-bottom: 1px solid var(--rule);
-    align-items: baseline;
-  }
-
-  .checks li::before {
-    content: counter(check);
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
-    min-width: 16px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .measure {
-    font-family: var(--mono);
-    font-size: 14px;
-    background: var(--surface-sunk);
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  footer {
-    color: var(--ink-muted);
-    font-size: 15px;
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
+  .run-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 3px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .pill.pass { background: var(--pass-soft); color: var(--pass); }
+  .pill.fail { background: var(--fail-soft); color: var(--fail); }
+
+  .run ul { font-size: 15.5px; gap: 5px; }
+
+  .note {
+    border-left: 2px solid var(--caught);
+    background: var(--caught-soft);
+    padding: 10px 14px;
+    border-radius: 0 3px 3px 0;
+    font-size: 15px;
+    max-width: 66ch;
+  }
+
+  .note .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--caught);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .measure {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    background: var(--surface-sunk);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .checks {
+    list-style: none;
+    padding: 0;
+    counter-reset: c;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    max-width: 66ch;
+  }
+
+  .checks li {
+    counter-increment: c;
+    display: flex;
+    gap: 12px;
+    padding: 8px 2px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15.5px;
+  }
+
+  .checks li::before {
+    content: counter(c);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--accent);
+    min-width: 14px;
+    padding-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  footer { color: var(--ink-muted); font-size: 15px; display: flex; flex-direction: column; gap: 8px; }
   footer h2 { color: var(--ink); }
 
   a { color: var(--accent); }
-  a:focus-visible, li:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 
 <div class="wrap">
 
   <header>
     <span class="eyebrow">Experiment report · August 2026</span>
-    <h1>Does written guidance actually change what an AI agent builds?</h1>
-    <p class="dek">We wrote a skill that teaches a coding agent how to build the loading, empty and error states of a UI component — then ran three tests to find out whether it makes any difference.</p>
+    <h1>Does written guidance change what an AI agent builds?</h1>
+    <p class="dek">We wrote a skill for building a component's loading, empty and error states, then tested whether agents actually follow it.</p>
   </header>
 
-  <div class="summary">
-    <h2>The short version</h2>
-    <p>Three runs. One where the guidance clearly wasn't applied, which scored <strong>0 of 5</strong>. Two where a fresh agent picked up the skill from a plain request and scored <strong>5 of 5</strong>, on app styles the guidance was never written for.</p>
-    <p>The tests also found two real defects in the guidance itself. Both are now fixed. Every serious fault we found — in the output and in the skill — was invisible in the code and only showed up by running the app.</p>
+  <div class="board">
+    <div class="tile">
+      <span class="who">Run 1 · control</span>
+      <span class="score fail">0/5</span>
+      <span class="what">Guidance not applied</span>
+    </div>
+    <div class="tile">
+      <span class="who">Run 2 · plain app</span>
+      <span class="score pass">5/5</span>
+      <span class="what">Fresh agent, one-line request</span>
+    </div>
+    <div class="tile">
+      <span class="who">Run 3 · custom styles</span>
+      <span class="score pass">5/5</span>
+      <span class="what">Fresh agent, hardest case</span>
+    </div>
   </div>
 
-  <hr class="divider" />
-
   <section>
-    <h2>What the skill does</h2>
-    <p>Most components get designed in one condition: full of data. But the same component has three others to handle — while the data is loading, when there is nothing to show, and when loading failed.</p>
-    <p>The usual mistake is to treat those as three separate screens. You end up with a nicely designed card for the data, and then a loading spinner floating alone on an empty page. Nothing looks related.</p>
-    <p>The skill's core rule is that these are <strong>the same component in different conditions</strong>. Same card, same size, same spacing, same typography. Only the middle changes.</p>
+    <h2>The idea</h2>
+    <p>A component gets designed full of data, but it also has to handle loading, having nothing to show, and failing. The usual mistake is designing those as separate screens — a polished card for the data, then a spinner alone on a blank page.</p>
+    <p>The skill's rule: <strong>same component, different conditions.</strong> Same card, same size, same spacing. Only the middle changes.</p>
   </section>
 
   <section>
-    <h2>Why it needed testing</h2>
-    <p>A written skill can look excellent and change nothing. The agent might never read it, or read it and fall back on habit anyway. The only way to know is to look at what actually gets built — and then run it, because the worst faults don't show up on screen.</p>
-    <p>The clearest example is a "Retry" button in an error state. It can compile, look correct, and be reported as working while being connected to nothing at all. Clicking it does nothing. No code review or screenshot catches this. You only find it by clicking it.</p>
-  </section>
-
-  <section>
-    <h2>How the test works</h2>
-    <p>Build a small app with a component that shows data and nothing else. Hand it to a fresh agent with a plain request — "add loading, empty and error states" — and no mention of the skill, since whether the agent finds it is part of what we're measuring. Then grade what comes back.</p>
-    <h3>Five checks on the code</h3>
+    <h2>The test</h2>
+    <p>Build an app with a component that only shows data. Hand it to a fresh agent with a plain request — "add loading, empty and error states" — and no mention of the skill, since whether it gets found is part of the measurement. Then grade it.</p>
     <ol class="checks">
       <li>Does the retry button connect to something real?</li>
       <li>Do all four states sit inside the same card?</li>
-      <li>Is loading a skeleton of the real layout, rather than a spinner?</li>
-      <li>Is the size pinned, so the card doesn't shrink when data is absent?</li>
-      <li>Can the empty state actually be reached at all?</li>
+      <li>Is loading a skeleton of the real layout, not a spinner?</li>
+      <li>Is the size pinned, so the card doesn't shrink?</li>
+      <li>Can the empty state be reached at all?</li>
     </ol>
-    <p>Then two checks the code cannot answer. Drive the running app into each state and measure that the card is the same size in all of them. And prove the retry button really re-runs the request, by breaking the data source, clicking retry, and watching for a second request.</p>
+    <p>Then two things code can't tell you: measure the card in every state, and prove retry re-runs the request by breaking the data source, repairing it live, and clicking.</p>
   </section>
 
   <section>
-    <h2>The three runs</h2>
+    <h2>Results</h2>
     <div class="runs">
 
       <article class="run">
         <div class="run-head">
-          <div>
-            <span class="run-id">Run 1 · control</span>
-            <h3>Product card, states generated elsewhere</h3>
-          </div>
-          <span class="score fail">0 of 5</span>
+          <h3>Run 1 — product card, states generated elsewhere</h3>
+          <span class="pill fail">0 of 5</span>
         </div>
-        <p class="run-meta">Reactive app style · standard component library</p>
-        <p>The retry button was dead. We confirmed it by breaking the data source, repairing it while the app ran, then clicking retry: nothing happened, and the app stayed stuck on the error message. The empty state could never appear at all, because the code treated "no data" as a failure — so asking for an empty result produced an error screen. Loading was a spinner on a blank page.</p>
-        <p>Net result: one working state out of four, in an app that looked finished.</p>
+        <ul>
+          <li><strong>Retry was dead.</strong> Repaired the data source, clicked, nothing happened.</li>
+          <li><strong>Empty was unreachable</strong> — the code treated "no data" as a failure, so it showed an error instead.</li>
+          <li>Loading was a spinner on a blank page; no shared card.</li>
+        </ul>
+        <p>One working state out of four, in an app that looked finished.</p>
       </article>
 
       <article class="run">
         <div class="run-head">
-          <div>
-            <span class="run-id">Run 2 · first real test</span>
-            <h3>Orders panel, plain app structure</h3>
-          </div>
-          <span class="score pass">5 of 5</span>
+          <h3>Run 2 — orders panel, different app style</h3>
+          <span class="pill pass">5 of 5</span>
         </div>
-        <p class="run-meta">Different app style · different component library</p>
-        <p>The agent found and applied the skill on its own from a one-line request. It also built a switch to force each state on demand without being asked, which is what made the retry proof possible in the first place. Retry was driven and confirmed working.</p>
+        <ul>
+          <li>Agent found and applied the skill on its own.</li>
+          <li>Built a switch to force each state, unprompted — which is what made retry provable.</li>
+          <li>Retry driven and confirmed working.</li>
+        </ul>
         <div class="note">
           <span class="label">Defect found in our own guidance</span>
-          The skill recommended an animation technique for the loading skeleton that keeps the app's renderer running permanently — even after the animation stops and the skeleton is hidden. Measured cost: <span class="measure">15–21%</span> of a CPU core, doing nothing, forever. The replacement method costs about <span class="measure">1%</span>. The guidance was rewritten.
+          The recommended skeleton animation keeps the renderer running permanently, even once hidden — <span class="measure">15–21%</span> of a CPU core, forever. The replacement costs about <span class="measure">1%</span>.
         </div>
       </article>
 
       <article class="run">
         <div class="run-head">
-          <div>
-            <span class="run-id">Run 3 · hard case</span>
-            <h3>Departure board, hand-made design system</h3>
-          </div>
-          <span class="score pass">5 of 5</span>
+          <h3>Run 3 — departure board, hand-made design system</h3>
+          <span class="pill pass">5 of 5</span>
         </div>
-        <p class="run-meta">Standalone control · no standard component library at all</p>
-        <p>This app used its own hand-written colour and text styles, so there was no familiar library for the agent to fall back on. It also already had a working Refresh button, which is a trap: refreshing should keep the visible data on screen, not blank it back into a skeleton.</p>
-        <p>It handled all of it. Refresh kept the rows visible during a slow reload. Two fast clicks produced one request rather than two. The card measured <span class="measure">402 × 208</span> in both the data state and the error state — identical, which is the whole promise of the skill.</p>
-        <p>Every rule we had added to the skill that same day showed up in the result.</p>
+        <ul>
+          <li>No standard component library to fall back on; it used the app's own styles throughout.</li>
+          <li>Refresh kept existing rows visible during a slow reload instead of blanking them.</li>
+          <li>Two fast clicks produced one request, not two.</li>
+          <li>Card measured <span class="measure">402 × 208</span> in both data and error states — identical.</li>
+        </ul>
       </article>
 
     </div>
   </section>
 
   <section>
-    <h2>What we changed in the skill</h2>
+    <h2>What we changed</h2>
     <ul>
       <li>Moved the six non-negotiable rules to the top, so a partial read still catches them.</li>
-      <li>Rewrote the rules so they apply to any app style and any design system, rather than assuming one.</li>
-      <li>Added a five-point self-check the agent runs on its own output before calling the work done.</li>
-      <li>Added five missing rules: a refresh keeps existing data on screen, retry can't be double-clicked into two requests, don't flash the skeleton on fast loads, announce state changes for screen readers, and paged lists are out of scope.</li>
-      <li>Replaced the animation advice that cost 15–21% of a CPU core.</li>
-      <li>Cut a large block of duplicated rules, so each rule now lives in exactly one place and can't drift out of sync.</li>
+      <li>Rewrote the rules to fit any app style and design system, not just one.</li>
+      <li>Added a self-check the agent runs before calling the work done.</li>
+      <li>Added five missing rules — refresh keeps data, retry can't double-fire, no skeleton flash on fast loads, announce changes for screen readers, paged lists out of scope.</li>
+      <li>Replaced the animation advice that cost 15–21% of a core.</li>
     </ul>
   </section>
 
   <section>
-    <h2>What it shows</h2>
-    <p><strong>Written guidance does change output — when it's read.</strong> Two independent agents, given a one-line request and no hint that a skill existed, produced correct and genuinely working results on app styles the guidance was never written for.</p>
-    <p><strong>Running the app is worth more than reviewing the code.</strong> The dead button, the unreachable empty state and the CPU cost were all invisible on the page and in the source. All three were found by running it.</p>
-    <p><strong>Testing the guidance improves the guidance.</strong> Two of the fixes above exist only because a test produced output that was correct by the rules as written, and still wrong in practice.</p>
+    <h2>Conclusions</h2>
+    <ul>
+      <li><strong>Guidance changes output when it's read.</strong> Two agents, one-line requests, no hint a skill existed — both correct on stacks the guidance was never written for.</li>
+      <li><strong>Running the app beats reviewing the code.</strong> The dead button, the unreachable state and the CPU cost were all invisible in source and screenshots.</li>
+      <li><strong>Testing guidance improves guidance.</strong> Two fixes exist only because output was correct by the rules as written, and still wrong in practice.</li>
+    </ul>
   </section>
 
   <hr class="divider" />
 
   <footer>
-    <h2>Honest limits</h2>
+    <h2>Limits</h2>
     <ul>
-      <li>Three runs is a useful signal, not a statistical sample.</li>
-      <li>The screen-reader announcements are in the code but haven't been checked with an actual screen reader.</li>
-      <li>The skeleton timing behaves sensibly but wasn't measured to the millisecond.</li>
-      <li>The first run was generated in a different tool, so it shows what happens without the guidance applied — not a like-for-like comparison of the same agent with and without it.</li>
+      <li>Three runs is a signal, not a sample.</li>
+      <li>Screen-reader announcements are in the code but untested with a real screen reader.</li>
+      <li>Run 1 came from a different tool, so it shows output without the guidance — not the same agent with and without it.</li>
     </ul>
   </footer>
 
