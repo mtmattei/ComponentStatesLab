@@ -1,0 +1,52 @@
+# Component-states eval fixtures
+
+Three Uno apps for testing the `uno-component-states` skill. Each pairs a
+*populated-only* component with a different stack, so a run proves the skill
+works beyond MVUX + Material rather than only on its home turf.
+
+| Fixture | Stack | Component | What it stresses |
+|---|---|---|---|
+| `ProductCardAppv2` | MVUX + Material + Toolkit | Product card (`MainPage.xaml`) | Reference **failure** case — generated externally, states are four separate screens |
+| `FluentStatesProbe` | Plain MVVM (INPC) + Fluent | Recent Orders card (`MainPage.xaml`) | Flag-bound visibility; Fluent token vocabulary |
+| `StationBoardLab` | Plain MVVM + custom tokens | `Controls/DepartureBoard.xaml` | Standalone `UserControl`; hand-rolled design system; an existing Refresh button |
+
+## How to run one
+
+Reset the fixture's component to its populated-only state (`git checkout` the
+component, view-model, and service files), then hand a fresh agent a plain
+request — "add loading, empty and error states to X" — with **no** mention of
+the skill or the grading criteria. Routing is part of what is being measured.
+
+## Grading
+
+**Static self-check** (from the skill's Phase 5) — each is a grep:
+
+1. Retry/CTA binds to a command that resolves in that template's DataContext
+2. The shell sits outside the state host; every state renders inside it
+3. Loading is a skeleton mirroring the populated layout, not a lone spinner
+4. The swap container carries the footprint pin
+5. Absence returns a value (no `?? throw`); the service has a forced-mode switch
+
+**Runtime** — drive each state, then prove the two things markup cannot show:
+
+- **Retry fires**: drive to Error, flip the mode file healthy while the app
+  runs, invoke Retry, assert a *new* line in the trace log and recovery to data.
+- **Footprint**: compare the state host's arranged bounds across states; equal
+  numbers pass, "looks about right" does not.
+
+Each fixture's service reads a mode file on every call and appends to a trace
+log (paths in the service source; modes are `slow` / `empty` / `error`).
+
+## Results so far (2026-08-17)
+
+- `ProductCardAppv2` — 0/5 static. Dead Retry (DataContext is the exception),
+  no shared shell, spinner loading, no pin, empty throws so `NoneTemplate` is
+  unreachable. Captures in the fixture folder.
+- `FluentStatesProbe` — 5/5 static, Retry proven. Caught one skill defect: the
+  skeleton pulse used a `RepeatBehavior="Forever"` storyboard, measured at
+  15-21% of one core idle (`Stop()` does not reclaim it). Skill now mandates a
+  `DispatcherTimer` pulse.
+- `StationBoardLab` — 5/5 static, plus all five rules added that day: reload
+  keeps data visible, re-entry guard (two rapid clicks produced one call),
+  flash delay, `LiveSetting` announcements, timer pulse. Host measured
+  402x208 in both data and error.

@@ -1,0 +1,25 @@
+<Page x:Class="StationBoardLab.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:StationBoardLab.Controls"
+      Background="#F4F6F8">
+
+  <Grid Padding="28">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0"
+               Text="Station Board"
+               FontSize="24"
+               FontWeight="SemiBold"
+               Foreground="{StaticResource InkBrush}"
+               Margin="0,0,0,18" />
+
+    <controls:DepartureBoard Grid.Row="1"
+                             VerticalAlignment="Top"
+                             HorizontalAlignment="Left"
+                             Width="440" />
+  </Grid>
+</Page>

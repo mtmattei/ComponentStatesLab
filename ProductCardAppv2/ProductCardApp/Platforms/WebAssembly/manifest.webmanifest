@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "ProductCardApp",
+  "display": "standalone",
+  "name": "ProductCardApp",
+  "short_name": "ProductCardApp",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "StationBoardLab",
+  "display": "standalone",
+  "name": "StationBoardLab",
+  "short_name": "StationBoardLab",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "FluentStatesProbe",
+  "display": "standalone",
+  "name": "FluentStatesProbe",
+  "short_name": "FluentStatesProbe",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

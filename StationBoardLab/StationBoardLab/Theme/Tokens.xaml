@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Station Board design tokens. App-specific vocabulary: not Material, not Fluent. -->
+
+  <Color x:Key="InkColor">#12161C</Color>
+  <Color x:Key="InkMutedColor">#5C6673</Color>
+  <Color x:Key="PanelColor">#FFFFFF</Color>
+  <Color x:Key="PanelEdgeColor">#DFE4EA</Color>
+  <Color x:Key="RailColor">#EEF1F5</Color>
+  <Color x:Key="SignalColor">#0F6E5C</Color>
+  <Color x:Key="AlarmColor">#B3261E</Color>
+
+  <SolidColorBrush x:Key="InkBrush" Color="{StaticResource InkColor}" />
+  <SolidColorBrush x:Key="InkMutedBrush" Color="{StaticResource InkMutedColor}" />
+  <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource PanelColor}" />
+  <SolidColorBrush x:Key="PanelEdgeBrush" Color="{StaticResource PanelEdgeColor}" />
+  <SolidColorBrush x:Key="RailBrush" Color="{StaticResource RailColor}" />
+  <SolidColorBrush x:Key="SignalBrush" Color="{StaticResource SignalColor}" />
+  <SolidColorBrush x:Key="AlarmBrush" Color="{StaticResource AlarmColor}" />
+
+  <x:Double x:Key="PanelRadius">10</x:Double>
+  <CornerRadius x:Key="PanelCornerRadius">10</CornerRadius>
+  <Thickness x:Key="PanelPadding">18,14</Thickness>
+  <x:Double x:Key="RowGap">10</x:Double>
+
+  <Style x:Key="PanelTitleText" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+
+  <Style x:Key="RowPrimaryText" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+
+  <Style x:Key="RowMetaText" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource InkMutedBrush}" />
+  </Style>
+
+  <Style x:Key="TrackNumberText" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource SignalBrush}" />
+  </Style>
+
+</ResourceDictionary>
