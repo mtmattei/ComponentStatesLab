@@ -10,6 +10,7 @@ works beyond MVUX + Material rather than only on its home turf.
 | `FluentStatesProbe` | Plain MVVM (INPC) + Fluent | Recent Orders card (`MainPage.xaml`) | Flag-bound visibility; Fluent token vocabulary |
 | `StationBoardLab` | Plain MVVM + custom tokens | `Controls/DepartureBoard.xaml` | Standalone `UserControl`; hand-rolled design system; an existing Refresh button |
 | `PartsFinderLab` | Plain MVVM + Fluent | Whole page, 4 regions (`MainPage.xaml`) | Phase 0 gate: 2 regions must get NO states; empty-kind taxonomy |
+| `InventoryCardLab` | MVUX + Fluent | Stock levels card (built from nothing) | The build-first-then-transform path; no component to start from |
 
 ## How to run one
 
@@ -52,3 +53,4 @@ log (paths in the service source; modes are `slow` / `empty` / `error`).
   flash delay, `LiveSetting` announcements, timer pulse. Host measured
   402x208 in both data and error.
 - `PartsFinderLab` — mixed page; correctly gave states to only 2 of 4 regions, two empty variants by cause, warehouse Retry proven. Agent confirmed Phase 0 drove the skip decisions.
+- `InventoryCardLab` — build-from-scratch path. Populated card and states landed as two separate commits (the states commit touches only the templates), Retry proven, 378x295 in data and error. Surfaced that FeedView has no hook for the skeleton-flash delay; skill now says to put it in the data layer or declare the gap.
