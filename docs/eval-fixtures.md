@@ -9,6 +9,7 @@ works beyond MVUX + Material rather than only on its home turf.
 | `ProductCardAppv2` | MVUX + Material + Toolkit | Product card (`MainPage.xaml`) | Reference **failure** case — generated externally, states are four separate screens |
 | `FluentStatesProbe` | Plain MVVM (INPC) + Fluent | Recent Orders card (`MainPage.xaml`) | Flag-bound visibility; Fluent token vocabulary |
 | `StationBoardLab` | Plain MVVM + custom tokens | `Controls/DepartureBoard.xaml` | Standalone `UserControl`; hand-rolled design system; an existing Refresh button |
+| `PartsFinderLab` | Plain MVVM + Fluent | Whole page, 4 regions (`MainPage.xaml`) | Phase 0 gate: 2 regions must get NO states; empty-kind taxonomy |
 
 ## How to run one
 
@@ -50,3 +51,4 @@ log (paths in the service source; modes are `slow` / `empty` / `error`).
   keeps data visible, re-entry guard (two rapid clicks produced one call),
   flash delay, `LiveSetting` announcements, timer pulse. Host measured
   402x208 in both data and error.
+- `PartsFinderLab` — mixed page; correctly gave states to only 2 of 4 regions, two empty variants by cause, warehouse Retry proven. Agent confirmed Phase 0 drove the skip decisions.

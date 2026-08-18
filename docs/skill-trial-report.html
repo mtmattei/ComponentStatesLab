@@ -280,7 +280,7 @@
   <header>
     <span class="eyebrow">Experiment report · August 2026</span>
     <h1>Does written guidance change what an AI agent builds?</h1>
-    <p class="dek">We wrote a skill for building a component's loading, empty and error states, then tested whether agents actually follow it.</p>
+    <p class="dek">We wrote a skill for building a component's loading, empty and error states, then ran four tests to find out whether agents actually follow it.</p>
   </header>
 
   <div class="board">
@@ -297,7 +297,12 @@
     <div class="tile">
       <span class="who">Run 3 · custom styles</span>
       <span class="score pass">5/5</span>
-      <span class="what">Fresh agent, hardest case</span>
+      <span class="what">Fresh agent, no standard library</span>
+    </div>
+    <div class="tile">
+      <span class="who">Run 4 · mixed page</span>
+      <span class="score pass">5/5</span>
+      <span class="what">Correctly left 2 of 4 regions alone</span>
     </div>
   </div>
 
@@ -366,6 +371,24 @@
         </ul>
       </article>
 
+      <article class="run">
+        <div class="run-head">
+          <h3>Run 4 — mixed page, four regions</h3>
+          <span class="pill pass">5 of 5</span>
+        </div>
+        <p>A page holding a static header, a static legend card, a one-record summary strip, and a search-fed list. The request said "the page's components", which naively means all four. The right answer is that two of them have no states at all.</p>
+        <ul>
+          <li><strong>It declined the static ones.</strong> Header and legend untouched, with the reason given: they render constants.</li>
+          <li><strong>Partial states where that's correct.</strong> The summary strip got loading and error but no empty — a single record either arrives or fails.</li>
+          <li><strong>Two different empty states, chosen by cause.</strong> "No parts match <em>zzz</em>" with a <em>Clear search</em> button, versus "No parts in the catalogue" with no button at all — because nothing in the app creates parts, so a call to action would be nonsense.</li>
+          <li>While the summary strip showed its error, the results list stayed fully populated — regions fail independently rather than blanking the page.</li>
+        </ul>
+        <div class="note">
+          <span class="label">Causal evidence, not just a pass</span>
+          Asked afterwards why it skipped two regions, the agent quoted the rule by name and traced the decision to it — a rule that had been added to the skill hours earlier. This is the clearest link in the experiment between what the guidance says and what the agent did.
+        </div>
+      </article>
+
     </div>
   </section>
 
@@ -377,15 +400,18 @@
       <li>Added a self-check the agent runs before calling the work done.</li>
       <li>Added five missing rules — refresh keeps data, retry can't double-fire, no skeleton flash on fast loads, announce changes for screen readers, paged lists out of scope.</li>
       <li>Replaced the animation advice that cost 15–21% of a core.</li>
+      <li>Added a check that runs first: <strong>does this component have states at all?</strong> A static header or a decorative card has none, and the old wording would have had the agent invent a data source to give it some.</li>
+      <li>Split "empty" into the kinds that actually differ — nothing yet, nothing matched, nothing right now — because they need different words and different actions.</li>
     </ul>
   </section>
 
   <section>
     <h2>Conclusions</h2>
     <ul>
-      <li><strong>Guidance changes output when it's read.</strong> Two agents, one-line requests, no hint a skill existed — both correct on stacks the guidance was never written for.</li>
+      <li><strong>Guidance changes output when it's read.</strong> Three agents, one-line requests, no hint a skill existed — all correct, on app styles the guidance was never written for.</li>
       <li><strong>Running the app beats reviewing the code.</strong> The dead button, the unreachable state and the CPU cost were all invisible in source and screenshots.</li>
-      <li><strong>Testing guidance improves guidance.</strong> Two fixes exist only because output was correct by the rules as written, and still wrong in practice.</li>
+      <li><strong>Testing guidance improves guidance.</strong> Three fixes exist only because output was correct by the rules as written, and still wrong in practice.</li>
+      <li><strong>Knowing when to do nothing is part of the job.</strong> Run 4's value is that the agent declined work it was loosely asked to do, and explained why.</li>
     </ul>
   </section>
 
@@ -401,8 +427,13 @@
       </div>
 
       <div class="q">
-        <h3>Three runs, and agents aren't deterministic. Would it pass again?</h3>
-        <p>Unknown — one run per fixture, no repeats. What makes it more than luck is that the two passes were on different app styles and the agent chose a <em>different</em> implementation mechanism each time, so it isn't one memorised path. The fixtures are committed, so re-running is cheap.</p>
+        <h3>Four runs, and agents aren't deterministic. Would it pass again?</h3>
+        <p>Unknown — one run per fixture, no repeats. What makes it more than luck is that the three passes were on different app styles and the agent chose a <em>different</em> implementation mechanism each time, so it isn't one memorised path. The fixtures are committed, so re-running is cheap.</p>
+      </div>
+
+      <div class="q">
+        <h3>What hasn't been tested at all?</h3>
+        <p>The biggest gap is the "build it from scratch" path: every run so far started from a component that already existed. That branch matters, because it is the one that produced Run 1's failure — states designed at the same time as the component, which is how you end up with four unrelated screens. Paged lists ("loading more" at the bottom of a list) are deliberately out of scope and the guidance says so rather than guessing.</p>
       </div>
 
       <div class="q">
@@ -433,6 +464,7 @@
     <ul>
       <li>The same-agent A/B, with the skill withheld.</li>
       <li>Repeat runs on the committed fixtures, to test consistency.</li>
+      <li>A run on the build-from-scratch path, which no test has covered.</li>
       <li>Screen-reader check on the announcements — they're in the code, unverified in practice.</li>
     </ul>
   </footer>
