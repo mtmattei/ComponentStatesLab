@@ -255,6 +255,19 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .qa { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--rule); }
+
+  .q {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .q h3 { color: var(--accent); font-size: 16px; max-width: 62ch; text-wrap: balance; }
+  .q p { font-size: 15.5px; }
+
   footer { color: var(--ink-muted); font-size: 15px; display: flex; flex-direction: column; gap: 8px; }
   footer h2 { color: var(--ink); }
 
@@ -378,12 +391,49 @@
 
   <hr class="divider" />
 
+  <section>
+    <h2>Questions you should expect</h2>
+    <div class="qa">
+
+      <div class="q">
+        <h3>Run 1 came from a different tool. How do you know the skill caused the difference?</h3>
+        <p>From Run 1 alone, we don't. It shows what the failure looks like, not that the skill fixed it. The evidence sits in Runs 2 and 3: the agent found the skill from a one-line request and produced things it had no reason to invent — pinning the card to a measured number, and building a state-forcing switch nobody asked for. <strong>The clean A/B — same fixture, same agent, skill withheld — hasn't been run.</strong> It's the obvious next step and costs about an hour.</p>
+      </div>
+
+      <div class="q">
+        <h3>Three runs, and agents aren't deterministic. Would it pass again?</h3>
+        <p>Unknown — one run per fixture, no repeats. What makes it more than luck is that the two passes were on different app styles and the agent chose a <em>different</em> implementation mechanism each time, so it isn't one memorised path. The fixtures are committed, so re-running is cheap.</p>
+      </div>
+
+      <div class="q">
+        <h3>You wrote the checks from failures you'd already seen. Isn't that circular?</h3>
+        <p>The checks do come from real defects, which is the right direction — but it means they prove the skill fixes <em>known</em> problems, not that it produces good states generally. What keeps it honest is that every check is mechanical and falsifiable: does clicking retry produce a second request, yes or no. None of them are "does this look right."</p>
+      </div>
+
+      <div class="q">
+        <h3>The agent built the fixture it was graded on. Who checked the work?</h3>
+        <p>I did, separately from the agent's own report. For Run 3 I drove each state myself, clicked retry, read the service log to confirm a second request, and measured the card in the running app. Run 1 the same. For Run 2 I relied partly on the agent's report — and independently measured the CPU problem it introduced, which is how that defect surfaced.</p>
+      </div>
+
+      <div class="q">
+        <h3>What did it cost?</h3>
+        <p>About <span class="measure">140k</span> and <span class="measure">170k</span> tokens per run, at <span class="measure">13</span> and <span class="measure">17</span> minutes each, unattended. Building each fixture took roughly an hour of my time. The skill itself is a single file, revised in place.</p>
+      </div>
+
+      <div class="q">
+        <h3>Is the dead retry button really a skill problem, or a platform one?</h3>
+        <p>Platform. In the error template, the data context is the exception object, so the obvious binding silently resolves to nothing — it compiles, renders enabled, and does nothing. The skill documents the workaround, but this is a footgun worth fixing or warning about upstream. Same for the animation cost in Run 2: nothing tells you the renderer stays awake.</p>
+      </div>
+
+    </div>
+  </section>
+
   <footer>
-    <h2>Limits</h2>
+    <h2>Not done yet</h2>
     <ul>
-      <li>Three runs is a signal, not a sample.</li>
-      <li>Screen-reader announcements are in the code but untested with a real screen reader.</li>
-      <li>Run 1 came from a different tool, so it shows output without the guidance — not the same agent with and without it.</li>
+      <li>The same-agent A/B, with the skill withheld.</li>
+      <li>Repeat runs on the committed fixtures, to test consistency.</li>
+      <li>Screen-reader check on the announcements — they're in the code, unverified in practice.</li>
     </ul>
   </footer>
 
