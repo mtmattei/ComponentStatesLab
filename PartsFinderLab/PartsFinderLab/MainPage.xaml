@@ -1,0 +1,296 @@
+<Page x:Class="PartsFinderLab.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:models="using:PartsFinderLab.Models"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid Padding="28" RowSpacing="18">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Page header: constants only -->
+    <StackPanel Grid.Row="0" Spacing="2">
+      <TextBlock Text="Parts Finder"
+                 Style="{StaticResource TitleTextBlockStyle}" />
+      <TextBlock Text="Search the depot catalogue by name or SKU."
+                 Style="{StaticResource CaptionTextBlockStyle}"
+                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+    </StackPanel>
+
+    <!-- Warehouse summary: one record from the service -->
+    <Border Grid.Row="1"
+            x:Name="WarehouseStrip"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="16,12"
+            HorizontalAlignment="Left"
+            MinWidth="420">
+
+      <!-- State host. MinHeight pins the populated content height (measured: 38px). -->
+      <Grid MinHeight="38">
+
+        <StackPanel Orientation="Horizontal" Spacing="24"
+                    Visibility="{x:Bind ViewModel.WarehouseState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Data}">
+          <StackPanel Spacing="1">
+            <TextBlock Text="Warehouse" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="{x:Bind ViewModel.Warehouse.Name, Mode=OneWay}"
+                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+          </StackPanel>
+          <StackPanel Spacing="1">
+            <TextBlock Text="Location" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="{x:Bind ViewModel.Warehouse.City, Mode=OneWay}"
+                       Style="{StaticResource BodyTextBlockStyle}" />
+          </StackPanel>
+          <StackPanel Spacing="1">
+            <TextBlock Text="Last sync" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="{x:Bind ViewModel.Warehouse.LastSync, Mode=OneWay}"
+                       Style="{StaticResource BodyTextBlockStyle}" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Loading: skeleton of the three label/value pairs above -->
+        <StackPanel x:Name="WarehouseSkeleton"
+                    Orientation="Horizontal" Spacing="24"
+                    Visibility="{x:Bind ViewModel.WarehouseState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Loading}">
+          <StackPanel Spacing="1">
+            <Grid Height="17">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="64" Height="10" />
+            </Grid>
+            <Grid Height="20">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="98" Height="13" />
+            </Grid>
+          </StackPanel>
+          <StackPanel Spacing="1">
+            <Grid Height="17">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="48" Height="10" />
+            </Grid>
+            <Grid Height="20">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="87" Height="13" />
+            </Grid>
+          </StackPanel>
+          <StackPanel Spacing="1">
+            <Grid Height="17">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="51" Height="10" />
+            </Grid>
+            <Grid Height="20">
+              <Border Style="{StaticResource SkeletonBlockStyle}" Width="36" Height="13" />
+            </Grid>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Error: the strip keeps its shell; the error brush is an accent, not a repaint -->
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center"
+                    Visibility="{x:Bind ViewModel.WarehouseState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Error}">
+          <TextBlock Text="Couldn't load warehouse details."
+                     Style="{StaticResource BodyTextBlockStyle}"
+                     Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                     VerticalAlignment="Center"
+                     AutomationProperties.LiveSetting="Polite" />
+          <Button x:Name="WarehouseRetryButton"
+                  Content="Retry"
+                  VerticalAlignment="Center"
+                  IsEnabled="{x:Bind ViewModel.CanRetryWarehouse, Mode=OneWay}"
+                  Click="{x:Bind ViewModel.RetryWarehouse}" />
+        </StackPanel>
+
+      </Grid>
+    </Border>
+
+    <!-- Search bar + legend card -->
+    <Grid Grid.Row="2" ColumnSpacing="18">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MaxWidth="420" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <Grid Grid.Column="0" ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox Grid.Column="0"
+                 PlaceholderText="Name or SKU"
+                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}" />
+        <Button Grid.Column="1" Content="Search"
+                IsEnabled="{x:Bind ViewModel.CanSearch, Mode=OneWay}"
+                Click="{x:Bind ViewModel.Search}" />
+      </Grid>
+
+      <!-- Legend: constant reference text -->
+      <Border Grid.Column="1"
+              x:Name="BinLegend"
+              Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="1"
+              CornerRadius="6"
+              Padding="14,10">
+        <StackPanel Spacing="3">
+          <TextBlock Text="Bin codes" Style="{StaticResource CaptionTextBlockStyle}"
+                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+          <TextBlock Text="A · brakes    B · drivetrain" Style="{StaticResource CaptionTextBlockStyle}" />
+          <TextBlock Text="C · filters   D · sensors" Style="{StaticResource CaptionTextBlockStyle}" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Results: list from the search service -->
+    <Border Grid.Row="3"
+            x:Name="ResultsPanel"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            MinWidth="620"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="18,14">
+      <StackPanel Spacing="10">
+        <TextBlock Text="Results" Style="{StaticResource BodyStrongTextBlockStyle}" />
+
+        <!-- State host. MinHeight pins the populated list height (measured: 5 rows x 32px). -->
+        <Grid MinHeight="160">
+
+          <ItemsControl ItemsSource="{x:Bind ViewModel.Results}"
+                        Visibility="{x:Bind ViewModel.ResultsState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Data}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="models:Part">
+                <Grid Padding="0,6" ColumnSpacing="16">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{x:Bind Sku}"
+                             Style="{StaticResource BodyTextBlockStyle}"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{x:Bind Name}"
+                             Style="{StaticResource BodyTextBlockStyle}"
+                             VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{x:Bind Bin}"
+                             Style="{StaticResource CaptionTextBlockStyle}"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                             VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="3" Text="{x:Bind OnHand}"
+                             Style="{StaticResource BodyStrongTextBlockStyle}"
+                             VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <!-- Loading: five skeleton rows on the same four-column rhythm -->
+          <StackPanel x:Name="ResultsSkeleton"
+                      VerticalAlignment="Top"
+                      Visibility="{x:Bind ViewModel.ResultsState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Loading}">
+            <Grid Height="32" ColumnSpacing="16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Grid.Column="0" Style="{StaticResource SkeletonBlockStyle}" Width="62" Height="13" />
+              <Border Grid.Column="1" Style="{StaticResource SkeletonBlockStyle}" Width="150" Height="13" />
+              <Border Grid.Column="2" Style="{StaticResource SkeletonBlockStyle}" Width="26" Height="11" />
+              <Border Grid.Column="3" Style="{StaticResource SkeletonBlockStyle}" Width="10" Height="13" />
+            </Grid>
+            <Grid Height="32" ColumnSpacing="16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Grid.Column="0" Style="{StaticResource SkeletonBlockStyle}" Width="62" Height="13" />
+              <Border Grid.Column="1" Style="{StaticResource SkeletonBlockStyle}" Width="159" Height="13" />
+              <Border Grid.Column="2" Style="{StaticResource SkeletonBlockStyle}" Width="26" Height="11" />
+              <Border Grid.Column="3" Style="{StaticResource SkeletonBlockStyle}" Width="10" Height="13" />
+            </Grid>
+            <Grid Height="32" ColumnSpacing="16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Grid.Column="0" Style="{StaticResource SkeletonBlockStyle}" Width="59" Height="13" />
+              <Border Grid.Column="1" Style="{StaticResource SkeletonBlockStyle}" Width="92" Height="13" />
+              <Border Grid.Column="2" Style="{StaticResource SkeletonBlockStyle}" Width="26" Height="11" />
+              <Border Grid.Column="3" Style="{StaticResource SkeletonBlockStyle}" Width="17" Height="13" />
+            </Grid>
+            <Grid Height="32" ColumnSpacing="16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Grid.Column="0" Style="{StaticResource SkeletonBlockStyle}" Width="61" Height="13" />
+              <Border Grid.Column="1" Style="{StaticResource SkeletonBlockStyle}" Width="138" Height="13" />
+              <Border Grid.Column="2" Style="{StaticResource SkeletonBlockStyle}" Width="26" Height="11" />
+              <Border Grid.Column="3" Style="{StaticResource SkeletonBlockStyle}" Width="17" Height="13" />
+            </Grid>
+            <Grid Height="32" ColumnSpacing="16">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Border Grid.Column="0" Style="{StaticResource SkeletonBlockStyle}" Width="62" Height="13" />
+              <Border Grid.Column="1" Style="{StaticResource SkeletonBlockStyle}" Width="132" Height="13" />
+              <Border Grid.Column="2" Style="{StaticResource SkeletonBlockStyle}" Width="27" Height="11" />
+              <Border Grid.Column="3" Style="{StaticResource SkeletonBlockStyle}" Width="10" Height="13" />
+            </Grid>
+          </StackPanel>
+
+          <!-- Empty: a successful search that returned nothing. Not an error. -->
+          <StackPanel Spacing="10"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Visibility="{x:Bind ViewModel.ResultsState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Empty}">
+            <TextBlock Text="{x:Bind ViewModel.EmptyMessage, Mode=OneWay}"
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       AutomationProperties.LiveSetting="Polite" />
+            <Button x:Name="ClearSearchButton"
+                    Content="Clear search"
+                    HorizontalAlignment="Center"
+                    IsEnabled="{x:Bind ViewModel.CanSearch, Mode=OneWay}"
+                    Click="{x:Bind ViewModel.ClearSearch}"
+                    Visibility="{x:Bind ViewModel.ShowClearSearch, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=True}" />
+          </StackPanel>
+
+          <!-- Error: the search did not produce a result at all. Recovery offered. -->
+          <StackPanel Spacing="10"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Visibility="{x:Bind ViewModel.ResultsState, Mode=OneWay, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Error}">
+            <TextBlock Text="Couldn't load results."
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                       HorizontalAlignment="Center"
+                       AutomationProperties.LiveSetting="Polite" />
+            <Button x:Name="ResultsRetryButton"
+                    Content="Retry"
+                    HorizontalAlignment="Center"
+                    IsEnabled="{x:Bind ViewModel.CanSearch, Mode=OneWay}"
+                    Click="{x:Bind ViewModel.Search}" />
+          </StackPanel>
+
+        </Grid>
+
+      </StackPanel>
+    </Border>
+  </Grid>
+</Page>

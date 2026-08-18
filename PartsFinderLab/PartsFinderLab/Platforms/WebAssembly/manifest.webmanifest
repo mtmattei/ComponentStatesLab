@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "PartsFinderLab",
+  "display": "standalone",
+  "name": "PartsFinderLab",
+  "short_name": "PartsFinderLab",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}
